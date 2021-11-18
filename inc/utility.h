@@ -2,6 +2,9 @@
 #define LOGGER_UTILITY_H
 
 
+namespace detail {
+
+
 template <std::size_t N>
 class ConstString {
 public:
@@ -15,14 +18,18 @@ public:
     }
 
     constexpr std::size_t size() const noexcept {
-        return N-1;
+        return N - 1;
     }
 
     std::array<char, N> m_content;
 };
 
+
 template <std::size_t N>
 ConstString(const char (&)[N]) -> ConstString<N>;
 
 
-#endif //LOGGER_UTILITY_H
+} // namespace detail
+
+
+#endif // LOGGER_UTILITY_H

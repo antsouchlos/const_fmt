@@ -1,9 +1,11 @@
-//
-// Created by andreas on 11/18/21.
-//
-
 #ifndef LOGGER_PARSING_H
 #define LOGGER_PARSING_H
+
+
+#include <utility.h>
+
+
+namespace detail {
 
 
 // clang-format off
@@ -38,12 +40,12 @@
 // clang-format on
 
 
-template<std::size_t N>
+template <std::size_t N>
 constexpr bool is_digit(ConstString<N> s, unsigned i) {
     return (s[i] > 47) && (s[i] < 58);
 }
 
-template<std::size_t N>
+template <std::size_t N>
 constexpr std::pair<unsigned, int> parse_number(ConstString<N> s, unsigned i) {
     while ((i < s.size()) && is_digit(s, i)) {
         ++i;
@@ -52,7 +54,7 @@ constexpr std::pair<unsigned, int> parse_number(ConstString<N> s, unsigned i) {
     return {i, 0};
 }
 
-template<std::size_t N>
+template <std::size_t N>
 constexpr std::pair<unsigned, int> parse_type(ConstString<N> s, unsigned i) {
     if (s[i] == 's') { // string
         ++i;
@@ -113,8 +115,9 @@ constexpr std::pair<unsigned, int> parse_type(ConstString<N> s, unsigned i) {
     return {i, -1};
 }
 
-template<std::size_t N>
-constexpr std::pair<unsigned, int> parse_fmt_string(ConstString<N> s, unsigned i) {
+template <std::size_t N>
+constexpr std::pair<unsigned, int> parse_fmt_string(ConstString<N> s,
+                                                    unsigned       i) {
     int result_extra_len = 0;
 
     if (s[i] == '0')
@@ -143,13 +146,12 @@ constexpr std::pair<unsigned, int> parse_fmt_string(ConstString<N> s, unsigned i
             return {i, -1};
         i = new_i;
         result_extra_len += extra_len;
-
     }
 
     return {i, result_extra_len};
 }
 
-template<std::size_t N>
+template <std::size_t N>
 constexpr std::pair<unsigned, int> parse_braces(ConstString<N> s, unsigned i) {
     int result_extra_len = 0;
 
@@ -174,7 +176,7 @@ constexpr std::pair<unsigned, int> parse_braces(ConstString<N> s, unsigned i) {
     return {i, -1};
 }
 
-template<std::size_t N>
+template <std::size_t N>
 constexpr int get_output_len(ConstString<N> s) {
     int result_extra_len = 0;
 
@@ -197,4 +199,7 @@ constexpr int get_output_len(ConstString<N> s) {
 }
 
 
-#endif //LOGGER_PARSING_H
+} // namespace detail
+
+
+#endif // LOGGER_PARSING_H

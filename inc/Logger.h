@@ -6,8 +6,8 @@
 #include <iostream>
 #include <tuple>
 
-#include <utility.h>
 #include <parsing.h>
+#include <utility.h>
 
 
 /*
@@ -17,18 +17,24 @@
  */
 
 
+namespace detail {
+
 template <typename T>
 concept output_policy_c = requires(T t) {
     t.write('c');
 };
 
+} // namespace detail
 
-template <output_policy_c output_policy_t>
+
+template <detail::output_policy_c output_policy_t>
 class Logger {
-public:
-    Logger(output_policy_t output_policy) : m_output_policy(output_policy) {}
 
-    template<ConstString msg, typename... args_t>
+public:
+    Logger(output_policy_t output_policy) : m_output_policy(output_policy) {
+    }
+
+    template <detail::ConstString msg, typename... args_t>
     void log(args_t...) {
         constexpr int len = get_output_len(msg);
         static_assert(len > 0, "Syntax error in log string");
