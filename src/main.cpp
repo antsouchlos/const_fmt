@@ -20,7 +20,7 @@ int main() {
 
     constexpr detail::ConstString s = "{:8.14c}";
 
-    constexpr auto result = detail::parse_fmt_string(s, 2);
+    constexpr auto result = detail::parse_fmt_string<s>(2);
 
     std::cout << "Is valid: " << result.is_valid << std::endl << std::endl;
 

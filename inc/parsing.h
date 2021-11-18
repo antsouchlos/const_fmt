@@ -17,6 +17,7 @@ namespace detail {
 
 enum class FormatType { s, c, b, B, d, o, x, X, a, A, e, E, f, F, g, G, p };
 
+// TODO: Maybe remove the length from here
 template <typename result_t>
 struct parse_result_t {
     bool     is_valid  = false;
@@ -79,8 +80,8 @@ constexpr bool is_digit(ConstString<N> s, unsigned i) {
  */
 
 
-template <std::size_t N>
-constexpr parse_result_t<int> parse_number(ConstString<N> s, unsigned i) {
+template <ConstString s>
+constexpr parse_result_t<int> parse_number(unsigned i) {
     int number = 0;
 
     while ((i < s.size()) && is_digit(s, i)) {
@@ -92,8 +93,8 @@ constexpr parse_result_t<int> parse_number(ConstString<N> s, unsigned i) {
     return {true, i, 0, number};
 }
 
-template <std::size_t N>
-constexpr parse_result_t<FormatType> parse_type(ConstString<N> s, unsigned i) {
+    template <ConstString s>
+constexpr parse_result_t<FormatType> parse_type(unsigned i) {
     if (s[i] == 's') { // string
         ++i;
         return {true, i, 1, FormatType::s};
@@ -153,9 +154,8 @@ constexpr parse_result_t<FormatType> parse_type(ConstString<N> s, unsigned i) {
     return {false, i, 0, FormatType::s};
 }
 
-template <std::size_t N>
-constexpr parse_result_t<fmt_string_result_t> parse_fmt_string(ConstString<N> s,
-                                                               unsigned i) {
+template <ConstString s>
+constexpr parse_result_t<fmt_string_result_t> parse_fmt_string(unsigned i) {
 
     fmt_string_result_t result;
 
@@ -167,7 +167,7 @@ constexpr parse_result_t<fmt_string_result_t> parse_fmt_string(ConstString<N> s,
     }
 
     if (is_digit(s, i)) {
-        auto [is_valid, new_i, len, number] = parse_number(s, i);
+        auto [is_valid, new_i, len, number] = parse_number<s>(i);
         if (!is_valid)
             return {false, i, 0, result};
         i             = new_i;
@@ -176,7 +176,7 @@ constexpr parse_result_t<fmt_string_result_t> parse_fmt_string(ConstString<N> s,
 
     if (s[i] == '.') {
         ++i;
-        auto [is_valid, new_i, len, number] = parse_number(s, i);
+        auto [is_valid, new_i, len, number] = parse_number<s>(i);
         if (!is_valid)
             return {false, i, 0, result};
         i                = new_i;
@@ -184,7 +184,7 @@ constexpr parse_result_t<fmt_string_result_t> parse_fmt_string(ConstString<N> s,
     }
 
     if (s[i] != '}') {
-        auto [is_valid, new_i, len, type] = parse_type(s, i);
+        auto [is_valid, new_i, len, type] = parse_type<s>(i);
         if (!is_valid)
             return {false, i, 0, result};
         i           = new_i;
@@ -194,8 +194,21 @@ constexpr parse_result_t<fmt_string_result_t> parse_fmt_string(ConstString<N> s,
     return {true, i, result_extra_len, result};
 }
 
-template <std::size_t N>
-constexpr std::pair<unsigned, int> parse_braces(ConstString<N> s, unsigned i) {
+template <ConstString s>
+constexpr unsigned count_braces(unsigned i) {
+    unsigned result = 0;
+
+    while (i < s.size()) {
+        if (s[i] == '{')
+            ++result;
+        ++i;
+    }
+
+    return result;
+}
+
+template <ConstString s>
+constexpr std::pair<unsigned, int> parse_braces(unsigned i) {
     int result_extra_len = 0;
 
     if (s[i] == '}') {
@@ -204,7 +217,7 @@ constexpr std::pair<unsigned, int> parse_braces(ConstString<N> s, unsigned i) {
     } else if (s[i] == ':') {
         ++i;
 
-        auto [is_valid, new_i, len, format_node] = parse_fmt_string(s, i);
+        auto [is_valid, new_i, len, format_node] = parse_fmt_string<s>(i);
         if (!is_valid)
             return {i, -1};
         i = new_i;
@@ -219,15 +232,15 @@ constexpr std::pair<unsigned, int> parse_braces(ConstString<N> s, unsigned i) {
     return {i, -1};
 }
 
-template <std::size_t N>
-constexpr int get_output_len(ConstString<N> s) {
+template <ConstString s>
+constexpr int get_output_len() {
     int result_extra_len = 0;
 
     for (unsigned i = 0; i < s.size(); ++i) {
         if (s[i] == '{') {
             ++i;
 
-            auto [new_i, extra_len] = parse_braces(s, i);
+            auto [new_i, extra_len] = parse_braces<s>(i);
             if (extra_len < 0)
                 return -1;
             i = new_i;
@@ -247,7 +260,7 @@ constexpr int get_output_len(ConstString<N> s) {
 
 template <detail::ConstString s, typename... args_t>
 const std::array<char, detail::get_output_len(s)> format(args_t...) {
-    constexpr int len = get_output_len(s);
+    constexpr int len = detail::get_output_len<s>();
     static_assert(len > 0, "Syntax error in log string");
 
     std::cout << "Computed Length: " << len << std::endl;
