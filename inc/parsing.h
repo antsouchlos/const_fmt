@@ -15,15 +15,22 @@ namespace detail {
  */
 
 
+enum class FormatType { s, c, b, B, d, o, x, X, a, A, e, E, f, F, g, G, p };
+
 template <typename result_t>
-struct parse_result {
-    bool     valid     = false;
+struct parse_result_t {
+    bool     is_valid  = false;
     unsigned new_index = 0;
     unsigned length    = 0;
     result_t result;
 };
 
-enum class FormatType { s, c, b, B, d, o, x, X, a, A, e, E, f, F, g, G, p };
+struct fmt_string_result_t {
+    bool       has_zero_padding = false;
+    int        length           = 6;
+    int        precision        = 2;
+    FormatType type             = FormatType::s;
+};
 
 
 // clang-format off
@@ -73,7 +80,7 @@ constexpr bool is_digit(ConstString<N> s, unsigned i) {
 
 
 template <std::size_t N>
-constexpr parse_result<int> parse_number(ConstString<N> s, unsigned i) {
+constexpr parse_result_t<int> parse_number(ConstString<N> s, unsigned i) {
     int number = 0;
 
     while ((i < s.size()) && is_digit(s, i)) {
@@ -86,7 +93,7 @@ constexpr parse_result<int> parse_number(ConstString<N> s, unsigned i) {
 }
 
 template <std::size_t N>
-constexpr parse_result<FormatType> parse_type(ConstString<N> s, unsigned i) {
+constexpr parse_result_t<FormatType> parse_type(ConstString<N> s, unsigned i) {
     if (s[i] == 's') { // string
         ++i;
         return {true, i, 1, FormatType::s};
@@ -99,9 +106,9 @@ constexpr parse_result<FormatType> parse_type(ConstString<N> s, unsigned i) {
     } else if (s[i] == 'B') {
         ++i;
         return {true, i, 1, FormatType::B};
-//    } else if (s[i] == 'c') {
-//        ++i;
-//        return {true, i, 1, FormatType::c};
+        //    } else if (s[i] == 'c') {
+        //        ++i;
+        //        return {true, i, 1, FormatType::c};
     } else if (s[i] == 'd') {
         ++i;
         return {true, i, 1, FormatType::d};
@@ -143,40 +150,48 @@ constexpr parse_result<FormatType> parse_type(ConstString<N> s, unsigned i) {
         return {true, i, 1, FormatType::p};
     }
 
-    return {false, i, 0, FormatType::a};
+    return {false, i, 0, FormatType::s};
 }
 
 template <std::size_t N>
-constexpr std::pair<unsigned, int> parse_fmt_string(ConstString<N> s,
-                                                    unsigned       i) {
-    int result_extra_len = 0;
+constexpr parse_result_t<fmt_string_result_t> parse_fmt_string(ConstString<N> s,
+                                                               unsigned i) {
 
-    if (s[i] == '0')
+    fmt_string_result_t result;
+
+    unsigned result_extra_len = 0;
+
+    if (s[i] == '0') {
         ++i;
+        result.has_zero_padding = true;
+    }
 
     if (is_digit(s, i)) {
         auto [is_valid, new_i, len, number] = parse_number(s, i);
-        if (!is_valid) return {i, -1};
-        i = new_i;
-        result_extra_len += number;
+        if (!is_valid)
+            return {false, i, 0, result};
+        i             = new_i;
+        result.length = number;
     }
 
     if (s[i] == '.') {
         ++i;
         auto [is_valid, new_i, len, number] = parse_number(s, i);
-        if (!is_valid) return {i, -1};
-        i = new_i;
-        result_extra_len += len;
+        if (!is_valid)
+            return {false, i, 0, result};
+        i                = new_i;
+        result.precision = number;
     }
 
     if (s[i] != '}') {
         auto [is_valid, new_i, len, type] = parse_type(s, i);
-        if (is_valid) return {i, -1};
-        i = new_i;
-//        result_extra_len += len;
+        if (!is_valid)
+            return {false, i, 0, result};
+        i           = new_i;
+        result.type = type;
     }
 
-    return {i, result_extra_len};
+    return {true, i, result_extra_len, result};
 }
 
 template <std::size_t N>
@@ -189,10 +204,11 @@ constexpr std::pair<unsigned, int> parse_braces(ConstString<N> s, unsigned i) {
     } else if (s[i] == ':') {
         ++i;
 
-        auto [new_i, extra_len] = parse_fmt_string(s, i);
-        if (extra_len < 0) return {i, -1};
+        auto [is_valid, new_i, len, format_node] = parse_fmt_string(s, i);
+        if (!is_valid)
+            return {i, -1};
         i = new_i;
-        result_extra_len += extra_len;
+        result_extra_len += len;
 
         if (s[i] == '}') {
             ++i;
@@ -212,7 +228,8 @@ constexpr int get_output_len(ConstString<N> s) {
             ++i;
 
             auto [new_i, extra_len] = parse_braces(s, i);
-            if (extra_len < 0) return -1;
+            if (extra_len < 0)
+                return -1;
             i = new_i;
             result_extra_len += extra_len;
 
