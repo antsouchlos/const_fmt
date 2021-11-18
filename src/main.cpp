@@ -16,7 +16,7 @@ int main() {
     Uart uart;
 
     Logger logger(uart);
-    logger.log<"Test format string: {:08.4f} {}">(1, 2, 3);
+    logger.log<"Test:{:88}">(1, 2, 3);
 
     return 0;
 }

@@ -8,6 +8,24 @@
 namespace detail {
 
 
+/*
+ *
+ * Parse format string
+ *
+ */
+
+
+template <typename result_t>
+struct parse_result {
+    bool     valid     = false;
+    unsigned new_index = 0;
+    unsigned length    = 0;
+    result_t result;
+};
+
+enum class FormatType { s, c, b, B, d, o, x, X, a, A, e, E, f, F, g, G, p };
+
+
 // clang-format off
 
 /*
@@ -45,74 +63,87 @@ constexpr bool is_digit(ConstString<N> s, unsigned i) {
     return (s[i] > 47) && (s[i] < 58);
 }
 
+
+/*
+ *
+ * Functions to convert X to char array
+ * and ConstString to X
+ *
+ */
+
+
 template <std::size_t N>
-constexpr std::pair<unsigned, int> parse_number(ConstString<N> s, unsigned i) {
+constexpr parse_result<int> parse_number(ConstString<N> s, unsigned i) {
+    int number = 0;
+
     while ((i < s.size()) && is_digit(s, i)) {
+        number = number * 10;
+        number += (s[i] - 48);
         ++i;
     }
 
-    return {i, 0};
+    return {true, i, 0, number};
 }
 
 template <std::size_t N>
-constexpr std::pair<unsigned, int> parse_type(ConstString<N> s, unsigned i) {
+constexpr parse_result<FormatType> parse_type(ConstString<N> s, unsigned i) {
     if (s[i] == 's') { // string
         ++i;
-        return {i, 0};
+        return {true, i, 1, FormatType::s};
     } else if (s[i] == 'c') { // char
         ++i;
-        return {i, 0};
+        return {true, i, 1, FormatType::c};
     } else if (s[i] == 'b') { // int
         ++i;
-        return {i, 0};
+        return {true, i, 1, FormatType::b};
     } else if (s[i] == 'B') {
         ++i;
-        return {i, 0};
-    } else if (s[i] == 'c') {
-        ++i;
-        return {i, 0};
+        return {true, i, 1, FormatType::B};
+//    } else if (s[i] == 'c') {
+//        ++i;
+//        return {true, i, 1, FormatType::c};
     } else if (s[i] == 'd') {
         ++i;
-        return {i, 0};
-    } else if (s[i] == '0') {
+        return {true, i, 1, FormatType::d};
+    } else if (s[i] == 'o') {
         ++i;
-        return {i, 0};
+        return {true, i, 1, FormatType::o};
     } else if (s[i] == 'x') {
         ++i;
-        return {i, 0};
+        return {true, i, 1, FormatType::x};
     } else if (s[i] == 'X') {
         ++i;
-        return {i, 0};
+        return {true, i, 1, FormatType::X};
     } else if (s[i] == 'a') { // float
         ++i;
-        return {i, 0};
+        return {true, i, 1, FormatType::a};
     } else if (s[i] == 'A') {
         ++i;
-        return {i, 0};
+        return {true, i, 1, FormatType::A};
     } else if (s[i] == 'e') {
         ++i;
-        return {i, 0};
+        return {true, i, 1, FormatType::e};
     } else if (s[i] == 'E') {
         ++i;
-        return {i, 0};
+        return {true, i, 1, FormatType::E};
     } else if (s[i] == 'f') {
         ++i;
-        return {i, 0};
+        return {true, i, 1, FormatType::f};
     } else if (s[i] == 'F') {
         ++i;
-        return {i, 0};
+        return {true, i, 1, FormatType::F};
     } else if (s[i] == 'g') {
         ++i;
-        return {i, 0};
+        return {true, i, 1, FormatType::g};
     } else if (s[i] == 'G') {
         ++i;
-        return {i, 0};
+        return {true, i, 1, FormatType::G};
     } else if (s[i] == 'p') { // pointer
         ++i;
-        return {i, 0};
+        return {true, i, 1, FormatType::p};
     }
 
-    return {i, -1};
+    return {false, i, 0, FormatType::a};
 }
 
 template <std::size_t N>
@@ -124,28 +155,25 @@ constexpr std::pair<unsigned, int> parse_fmt_string(ConstString<N> s,
         ++i;
 
     if (is_digit(s, i)) {
-        auto [new_i, extra_len] = parse_number(s, i);
-        if (extra_len < 0)
-            return {i, -1};
+        auto [is_valid, new_i, len, number] = parse_number(s, i);
+        if (!is_valid) return {i, -1};
         i = new_i;
-        result_extra_len += extra_len;
+        result_extra_len += number;
     }
 
     if (s[i] == '.') {
         ++i;
-        auto [new_i, extra_len] = parse_number(s, i);
-        if (extra_len < 0)
-            return {i, -1};
+        auto [is_valid, new_i, len, number] = parse_number(s, i);
+        if (!is_valid) return {i, -1};
         i = new_i;
-        result_extra_len += extra_len;
+        result_extra_len += len;
     }
 
     if (s[i] != '}') {
-        auto [new_i, extra_len] = parse_type(s, i);
-        if (extra_len < 0)
-            return {i, -1};
+        auto [is_valid, new_i, len, type] = parse_type(s, i);
+        if (is_valid) return {i, -1};
         i = new_i;
-        result_extra_len += extra_len;
+//        result_extra_len += len;
     }
 
     return {i, result_extra_len};
@@ -162,8 +190,7 @@ constexpr std::pair<unsigned, int> parse_braces(ConstString<N> s, unsigned i) {
         ++i;
 
         auto [new_i, extra_len] = parse_fmt_string(s, i);
-        if (extra_len < 0)
-            return {i, -1};
+        if (extra_len < 0) return {i, -1};
         i = new_i;
         result_extra_len += extra_len;
 
@@ -185,8 +212,7 @@ constexpr int get_output_len(ConstString<N> s) {
             ++i;
 
             auto [new_i, extra_len] = parse_braces(s, i);
-            if (extra_len < 0)
-                return -1;
+            if (extra_len < 0) return -1;
             i = new_i;
             result_extra_len += extra_len;
 
@@ -200,6 +226,17 @@ constexpr int get_output_len(ConstString<N> s) {
 
 
 } // namespace detail
+
+
+template <detail::ConstString s, typename... args_t>
+const std::array<char, detail::get_output_len(s)> format(args_t...) {
+    constexpr int len = get_output_len(s);
+    static_assert(len > 0, "Syntax error in log string");
+
+    std::cout << "Computed Length: " << len << std::endl;
+
+    return {0};
+}
 
 
 #endif // LOGGER_PARSING_H

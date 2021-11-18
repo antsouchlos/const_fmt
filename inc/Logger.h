@@ -35,14 +35,11 @@ public:
     }
 
     template <detail::ConstString msg, typename... args_t>
-    void log(args_t...) {
-        constexpr int len = get_output_len(msg);
-        static_assert(len > 0, "Syntax error in log string");
+    void log(args_t... args) {
+        const auto formatted_msg = format<msg>(args...);
 
-        std::cout << "Computed Length: " << len << std::endl;
-
-        for (unsigned i = 0; i < msg.size(); ++i) {
-            m_output_policy.write(msg[i]);
+        for (const auto& c : formatted_msg) {
+            m_output_policy.write(c);
         }
     }
 
