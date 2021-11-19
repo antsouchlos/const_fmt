@@ -22,7 +22,6 @@ template <typename result_t>
 struct parse_result_t {
     bool     is_valid  = false;
     unsigned new_index = 0;
-    unsigned length    = 0;
     result_t result;
 };
 
@@ -32,6 +31,9 @@ struct fmt_string_result_t {
     int        precision        = 2;
     FormatType type             = FormatType::s;
 };
+
+template <std::size_t N>
+using string_result_t = std::array<fmt_string_result_t, N>;
 
 
 // clang-format off
@@ -90,68 +92,68 @@ constexpr parse_result_t<int> parse_number(unsigned i) {
         ++i;
     }
 
-    return {true, i, 0, number};
+    return {true, i, number};
 }
 
-    template <ConstString s>
+template <ConstString s>
 constexpr parse_result_t<FormatType> parse_type(unsigned i) {
     if (s[i] == 's') { // string
         ++i;
-        return {true, i, 1, FormatType::s};
+        return {true, i, FormatType::s};
     } else if (s[i] == 'c') { // char
         ++i;
-        return {true, i, 1, FormatType::c};
+        return {true, i, FormatType::c};
     } else if (s[i] == 'b') { // int
         ++i;
-        return {true, i, 1, FormatType::b};
+        return {true, i, FormatType::b};
     } else if (s[i] == 'B') {
         ++i;
-        return {true, i, 1, FormatType::B};
+        return {true, i, FormatType::B};
         //    } else if (s[i] == 'c') {
         //        ++i;
-        //        return {true, i, 1, FormatType::c};
+        //        return {true, i, FormatType::c};
     } else if (s[i] == 'd') {
         ++i;
-        return {true, i, 1, FormatType::d};
+        return {true, i, FormatType::d};
     } else if (s[i] == 'o') {
         ++i;
-        return {true, i, 1, FormatType::o};
+        return {true, i, FormatType::o};
     } else if (s[i] == 'x') {
         ++i;
-        return {true, i, 1, FormatType::x};
+        return {true, i, FormatType::x};
     } else if (s[i] == 'X') {
         ++i;
-        return {true, i, 1, FormatType::X};
+        return {true, i, FormatType::X};
     } else if (s[i] == 'a') { // float
         ++i;
-        return {true, i, 1, FormatType::a};
+        return {true, i, FormatType::a};
     } else if (s[i] == 'A') {
         ++i;
-        return {true, i, 1, FormatType::A};
+        return {true, i, FormatType::A};
     } else if (s[i] == 'e') {
         ++i;
-        return {true, i, 1, FormatType::e};
+        return {true, i, FormatType::e};
     } else if (s[i] == 'E') {
         ++i;
-        return {true, i, 1, FormatType::E};
+        return {true, i, FormatType::E};
     } else if (s[i] == 'f') {
         ++i;
-        return {true, i, 1, FormatType::f};
+        return {true, i, FormatType::f};
     } else if (s[i] == 'F') {
         ++i;
-        return {true, i, 1, FormatType::F};
+        return {true, i, FormatType::F};
     } else if (s[i] == 'g') {
         ++i;
-        return {true, i, 1, FormatType::g};
+        return {true, i, FormatType::g};
     } else if (s[i] == 'G') {
         ++i;
-        return {true, i, 1, FormatType::G};
+        return {true, i, FormatType::G};
     } else if (s[i] == 'p') { // pointer
         ++i;
-        return {true, i, 1, FormatType::p};
+        return {true, i, FormatType::p};
     }
 
-    return {false, i, 0, FormatType::s};
+    return {false, i, FormatType::s};
 }
 
 template <ConstString s>
@@ -159,99 +161,105 @@ constexpr parse_result_t<fmt_string_result_t> parse_fmt_string(unsigned i) {
 
     fmt_string_result_t result;
 
-    unsigned result_extra_len = 0;
-
     if (s[i] == '0') {
         ++i;
         result.has_zero_padding = true;
     }
 
     if (is_digit(s, i)) {
-        auto [is_valid, new_i, len, number] = parse_number<s>(i);
+        auto [is_valid, new_i, number] = parse_number<s>(i);
         if (!is_valid)
-            return {false, i, 0, result};
+            return {false, i, result};
         i             = new_i;
         result.length = number;
     }
 
     if (s[i] == '.') {
         ++i;
-        auto [is_valid, new_i, len, number] = parse_number<s>(i);
+        auto [is_valid, new_i, number] = parse_number<s>(i);
         if (!is_valid)
-            return {false, i, 0, result};
+            return {false, i, result};
         i                = new_i;
         result.precision = number;
     }
 
     if (s[i] != '}') {
-        auto [is_valid, new_i, len, type] = parse_type<s>(i);
+        auto [is_valid, new_i, type] = parse_type<s>(i);
         if (!is_valid)
-            return {false, i, 0, result};
+            return {false, i, result};
         i           = new_i;
         result.type = type;
     }
 
-    return {true, i, result_extra_len, result};
+    return {true, i, result};
 }
 
 template <ConstString s>
-constexpr unsigned count_braces(unsigned i) {
+constexpr parse_result_t<fmt_string_result_t> parse_braces(unsigned i) {
+    if (s[i] == '}') {
+        ++i;
+        return {true, i, {}};
+    } else if (s[i] == ':') {
+        ++i;
+
+        auto [is_valid, new_i, format_node] = parse_fmt_string<s>(i);
+        if (!is_valid)
+            return {false, i, {}};
+        i = new_i;
+
+        if (s[i] == '}') {
+            ++i;
+            return {true, i, format_node};
+        }
+    }
+
+    return {false, i, {}};
+}
+
+template <ConstString s>
+constexpr unsigned count_braces() {
     unsigned result = 0;
 
-    while (i < s.size()) {
+    for (unsigned i = 0; i < s.size(); ++i) {
         if (s[i] == '{')
             ++result;
-        ++i;
     }
 
     return result;
 }
 
 template <ConstString s>
-constexpr std::pair<unsigned, int> parse_braces(unsigned i) {
-    int result_extra_len = 0;
+constexpr parse_result_t<string_result_t<count_braces<s>()>> parse_string() {
+    parse_result_t<string_result_t<count_braces<s>()>> result;
+    result.is_valid = true;
 
-    if (s[i] == '}') {
-        ++i;
-        return {i, result_extra_len};
-    } else if (s[i] == ':') {
-        ++i;
-
-        auto [is_valid, new_i, len, format_node] = parse_fmt_string<s>(i);
-        if (!is_valid)
-            return {i, -1};
-        i = new_i;
-        result_extra_len += len;
-
-        if (s[i] == '}') {
-            ++i;
-            return {i, result_extra_len};
-        }
-    }
-
-    return {i, -1};
-}
-
-template <ConstString s>
-constexpr int get_output_len() {
-    int result_extra_len = 0;
+    unsigned format_node_pos = 0;
 
     for (unsigned i = 0; i < s.size(); ++i) {
         if (s[i] == '{') {
             ++i;
 
-            auto [new_i, extra_len] = parse_braces<s>(i);
-            if (extra_len < 0)
-                return -1;
+            auto [is_valid, new_i, format_node] = parse_braces<s>(i);
+            if (!is_valid) {
+                return {false, i, {}};
+            }
             i = new_i;
-            result_extra_len += extra_len;
+            result.result[format_node_pos] = format_node;
 
         } else if (s[i] == '}') {
-            return -1;
+            return {false, i, {}};
         }
     }
 
-    return (result_extra_len + s.size());
+    return result;
+}
+
+template <ConstString s>
+constexpr int get_output_len() {
+    constexpr auto result = parse_string<s>();
+
+    // TODO
+    return result.is_valid;
 }
 
 
@@ -259,7 +267,7 @@ constexpr int get_output_len() {
 
 
 template <detail::ConstString s, typename... args_t>
-const std::array<char, detail::get_output_len(s)> format(args_t...) {
+constexpr std::array<char, detail::get_output_len<s>()> format(args_t...) {
     constexpr int len = detail::get_output_len<s>();
     static_assert(len > 0, "Syntax error in log string");
 
