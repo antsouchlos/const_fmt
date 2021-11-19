@@ -20,7 +20,7 @@ int main() {
 
     std::cout << std::endl;
 
-    constexpr auto ast = detail::parse_string<"Test: {:16.8} {:03.5} {:08.2}">();
+    constexpr auto ast = detail::parse_string<"Test: {:16.8f} {:03.5} {:08.2}">();
     static_assert(ast.is_valid);
 
     for (const auto& format_node : ast.result) {

@@ -244,7 +244,7 @@ constexpr parse_result_t<string_result_t<count_braces<s>()>> parse_string() {
                 return {false, i, {}};
             }
             i = new_i;
-            result.result[format_node_pos] = format_node;
+            result.result[format_node_pos++] = format_node;
 
         } else if (s[i] == '}') {
             return {false, i, {}};
