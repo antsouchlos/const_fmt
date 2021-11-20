@@ -8,16 +8,8 @@
 namespace detail {
 
 
-/*
- *
- * Parse format string
- *
- */
-
-
 enum class FormatType { s, c, b, B, d, o, x, X, a, A, e, E, f, F, g, G, p };
 
-// TODO: Maybe remove the length from here
 template <typename result_t>
 struct parse_result_t {
     bool     is_valid  = false;
@@ -25,7 +17,7 @@ struct parse_result_t {
     result_t result;
 };
 
-struct fmt_string_result_t {
+struct fmt_node_t {
     bool       has_zero_padding = false;
     int        length           = 6;
     int        precision        = 2;
@@ -33,7 +25,7 @@ struct fmt_string_result_t {
 };
 
 template <std::size_t N>
-using string_result_t = std::array<fmt_string_result_t, N>;
+using string_result_t = std::array<fmt_node_t, N>;
 
 
 // clang-format off
@@ -72,14 +64,6 @@ template <std::size_t N>
 constexpr bool is_digit(ConstString<N> s, unsigned i) {
     return (s[i] > 47) && (s[i] < 58);
 }
-
-
-/*
- *
- * Functions to convert X to char array
- * and ConstString to X
- *
- */
 
 
 template <ConstString s>
@@ -157,9 +141,8 @@ constexpr parse_result_t<FormatType> parse_type(unsigned i) {
 }
 
 template <ConstString s>
-constexpr parse_result_t<fmt_string_result_t> parse_fmt_string(unsigned i) {
-
-    fmt_string_result_t result;
+constexpr parse_result_t<fmt_node_t> parse_fmt_string(unsigned i) {
+    fmt_node_t result;
 
     if (s[i] == '0') {
         ++i;
@@ -195,7 +178,7 @@ constexpr parse_result_t<fmt_string_result_t> parse_fmt_string(unsigned i) {
 }
 
 template <ConstString s>
-constexpr parse_result_t<fmt_string_result_t> parse_braces(unsigned i) {
+constexpr parse_result_t<fmt_node_t> parse_braces(unsigned i) {
     if (s[i] == '}') {
         ++i;
         return {true, i, {}};
