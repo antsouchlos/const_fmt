@@ -46,10 +46,8 @@ public:
         return m_is_char;
     }
 
-private:
-    bool m_is_char = false;
-
-    char       m_c = 'c';
+    bool       m_is_char = false;
+    char       m_c       = 'c';
     fmt_node_t m_node;
 };
 
@@ -58,4 +56,4 @@ template <std::size_t N>
 using string_result_t = std::array<ast_node_t, N>;
 
 
-#endif //LOGGER_PARSE_TYPES_H
+#endif // LOGGER_PARSE_TYPES_H

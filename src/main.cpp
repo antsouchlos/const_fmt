@@ -12,9 +12,13 @@ public:
 
 
 int main() {
-    constexpr detail::ConstString s{"Test: {:16.8f} {:03.5} {:08.2}"};
+    constexpr detail::ConstString s{"Test: {:3.8f} {:02.5} {:05.2}"};
 
     const auto formatted = format<s>(3.4, "abc", 8.98754);
+
+    for (const auto& c : formatted)
+        std::cout << c;
+    std::cout << std::endl;
 
     return 0;
 }
