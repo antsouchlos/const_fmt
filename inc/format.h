@@ -103,7 +103,7 @@ constexpr char_array_t format_args(char_array_t result, first_arg_t first_arg,
 
 
 template <detail::ConstString s, typename... args_t>
-std::array<char, detail::get_output_len<s>()> format(args_t... args) {
+constexpr std::array<char, detail::get_output_len<s>()> format(args_t... args) {
     constexpr auto parse_result = detail::parse_string<s>();
     static_assert(parse_result.is_valid, "Syntax error in format string");
 

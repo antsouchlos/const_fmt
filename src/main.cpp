@@ -12,7 +12,7 @@ public:
 
 
 int main() {
-    const auto formatted = format<"Test: {:3.8f} {:5.5} {:05.2}">(3.4, "abc", 1234);
+    constexpr auto formatted = format<"Test: {:3.8f} {:5.5} {:05.2}">(3.4, "abc", 1234);
 
     for (const auto& c : formatted)
         std::cout << c;
