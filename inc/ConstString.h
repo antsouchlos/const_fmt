@@ -1,16 +1,8 @@
-#ifndef LOGGER_UTILITY_H
-#define LOGGER_UTILITY_H
+#ifndef LOGGER_CONSTSTRING_H
+#define LOGGER_CONSTSTRING_H
 
 
 namespace detail {
-
-
-constexpr std::size_t const_pow(std::size_t base, int exponent) {
-    if (exponent == 0)
-        return 1;
-    else
-        return base * const_pow(base, exponent -1);
-}
 
 
 template <std::size_t N>
@@ -40,4 +32,4 @@ ConstString(const char (&)[N]) -> ConstString<N>;
 } // namespace detail
 
 
-#endif // LOGGER_UTILITY_H
+#endif // LOGGER_CONSTSTRING_H

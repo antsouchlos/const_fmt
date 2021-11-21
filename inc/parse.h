@@ -1,31 +1,9 @@
-#ifndef LOGGER_PARSING_H
-#define LOGGER_PARSING_H
+#ifndef LOGGER_PARSE_H
+#define LOGGER_PARSE_H
 
 
-#include <utility.h>
-
-
-namespace detail {
-
-
-enum class FormatType { s, c, b, B, d, o, x, X, a, A, e, E, f, F, g, G, p };
-
-template <typename value_t>
-struct parse_result_t {
-    bool     is_valid  = false;
-    unsigned new_index = 0;
-    value_t  value;
-};
-
-struct fmt_node_t {
-    bool       has_zero_padding = false;
-    int        length           = 6;
-    int        precision        = 2;
-    FormatType type             = FormatType::s;
-};
-
-template <std::size_t N>
-using string_result_t = std::array<fmt_node_t, N>;
+#include "ConstString.h"
+#include "parse_types.h"
 
 
 // clang-format off
@@ -58,6 +36,63 @@ using string_result_t = std::array<fmt_node_t, N>;
  */
 
 // clang-format on
+
+
+namespace detail {
+
+
+/*
+ *
+ * Functions to determine the size of data structures
+ *
+ */
+
+
+template <ConstString s>
+constexpr unsigned count_braces() {
+    unsigned result = 0;
+
+    for (unsigned i = 0; i < s.size(); ++i) {
+        if (s[i] == '{')
+            ++result;
+    }
+
+    return result;
+}
+
+template <ConstString s>
+constexpr unsigned strlen_braces() {
+    unsigned result = 0;
+
+    bool brace_open = false;
+    for (unsigned i = 0; i < s.size(); ++i) {
+        if (!brace_open) {
+            if (s[i] == '{') {
+                brace_open = true;
+                ++result;
+            }
+        } else {
+            ++result;
+            if (s[i] == '}') {
+                brace_open = false;
+            }
+        }
+    }
+
+    return result;
+}
+
+template <ConstString s>
+constexpr int get_ast_len() {
+    return (s.size() - strlen_braces<s>() + count_braces<s>());
+}
+
+
+/*
+ *
+ * Parsing functions
+ *
+ */
 
 
 template <std::size_t N>
@@ -200,47 +235,14 @@ constexpr parse_result_t<fmt_node_t> parse_braces(unsigned i) {
 }
 
 template <ConstString s>
-constexpr unsigned count_braces() {
-    unsigned result = 0;
-
-    for (unsigned i = 0; i < s.size(); ++i) {
-        if (s[i] == '{')
-            ++result;
-    }
-
-    return result;
-}
-
-template <ConstString s>
-constexpr unsigned len_braces() {
-    unsigned result = 0;
-
-    bool brace_open = false;
-    for (unsigned i = 0; i < s.size(); ++i) {
-        if (!brace_open) {
-            if (s[i] == '{') {
-                brace_open = true;
-                ++result;
-            }
-        } else {
-            ++result;
-            if (s[i] == '}') {
-                brace_open = false;
-            }
-        }
-    }
-
-    return result;
-}
-
-template <ConstString s>
-constexpr parse_result_t<string_result_t<count_braces<s>()>> parse_string() {
-    parse_result_t<string_result_t<count_braces<s>()>> result;
+constexpr parse_result_t<string_result_t<get_ast_len<s>()>> parse_string() {
+    parse_result_t<string_result_t<get_ast_len<s>()>> result;
     result.is_valid = true;
 
-    unsigned format_node_pos = 0;
+    unsigned ast_position = 0;
 
-    for (unsigned i = 0; i < s.size(); ++i) {
+    unsigned i = 0;
+    while (i < s.size()) {
         if (s[i] == '{') {
             ++i;
 
@@ -248,26 +250,15 @@ constexpr parse_result_t<string_result_t<count_braces<s>()>> parse_string() {
             if (!is_valid) {
                 return {false, i, {}};
             }
-            i                               = new_i;
-            result.value[format_node_pos++] = format_node;
+            i = new_i;
+            result.value[ast_position++].set_node(format_node);
 
         } else if (s[i] == '}') {
             return {false, i, {}};
+        } else {
+            result.value[ast_position++].set_char(s[i]);
+            ++i;
         }
-    }
-
-    return result;
-}
-
-template <ConstString s>
-constexpr int get_output_len() {
-    constexpr auto parse_result = parse_string<s>();
-    static_assert(parse_result.is_valid, "Syntax error in log string");
-
-    unsigned result = s.size() - len_braces<s>();
-
-    for (const auto& fmt_node : parse_result.value) {
-        result += fmt_node.length;
     }
 
     return result;
@@ -277,28 +268,5 @@ constexpr int get_output_len() {
 } // namespace detail
 
 
-template <detail::ConstString s, typename... args_t>
-std::array<char, detail::get_output_len<s>()> format(args_t...) {
-    std::array<char, detail::get_output_len<s>()> result;
 
-    constexpr auto parse_result = detail::parse_string<s>();
-    static_assert(parse_result.is_valid);
-
-    std::cout << "Total computed length: " << result.size() << std::endl;
-
-    for (const auto& format_node : parse_result.value) {
-        std::cout << "\tFormat Node:" << std::endl;
-        std::cout << "\t\thas_zero_padding:\t" << format_node.has_zero_padding
-                  << std::endl;
-        std::cout << "\t\tlength:\t\t\t\t" << format_node.length << std::endl;
-        std::cout << "\t\tprecision:\t\t\t" << format_node.precision
-                  << std::endl;
-        std::cout << "\t\ttype:\t\t\t\t" << static_cast<int>(format_node.type)
-                  << std::endl;
-    }
-
-    return result;
-}
-
-
-#endif // LOGGER_PARSING_H
+#endif // LOGGER_PARSE_H
