@@ -8,9 +8,10 @@
 
 namespace detail {
 
-template<fmt_node_t fmt_node, typename T>
+template <fmt_node_t fmt_node, typename T>
 constexpr void check_fmt_params() {
-    static_assert(fmt_node.length > fmt_node.precision + 1, "Insufficient length for desired precision");
+    static_assert(fmt_node.length > fmt_node.precision + 1,
+                  "Insufficient length for desired precision");
 }
 
 
@@ -32,14 +33,25 @@ constexpr int get_output_len() {
 }
 
 
+template <std::size_t len, bool zeroed>
+constexpr std::array<char, len> get_init_array() {
+    if constexpr (zeroed) {
+        return {'0'};
+    } else {
+        return {' '};
+    }
+}
+
+
+// TODO: See if this is possible with charconv
 template <fmt_node_t fmt_node, std::integral arg_t>
 constexpr std::array<char, fmt_node.length> format_arg(arg_t arg) {
     check_fmt_params<fmt_node, arg_t>();
 
-    std::array<char, fmt_node.length> result;
+    std::array<char, fmt_node.length> result =
+        get_init_array<fmt_node.length, fmt_node.has_zero_padding>();
 
-    // TODO: See if this is possible with charconv
-    for (unsigned i = 1; i <= result.size(); ++i) {
+    for (unsigned i = 1; (i <= result.size()) && arg > 0; ++i) {
         result[result.size() - i] = arg % 10 + 48;
         arg                       = arg / 10;
     }
@@ -47,38 +59,32 @@ constexpr std::array<char, fmt_node.length> format_arg(arg_t arg) {
     return result;
 }
 
+// TODO: See if this is possible with charconv
 template <fmt_node_t fmt_node, std::floating_point arg_t>
 constexpr std::array<char, fmt_node.length> format_arg(arg_t arg) {
     check_fmt_params<fmt_node, arg_t>();
 
-    std::array<char, fmt_node.length> result;
-
     constexpr unsigned len_before_point =
         fmt_node.length - fmt_node.precision - 1;
-
-    result[result.size() - fmt_node.precision - 1] = '.';
-
-    // TODO: See if this is possible with charconv
-
     constexpr unsigned multiplier = const_pow(10, fmt_node.precision);
+
+    std::array<char, fmt_node.length> result =
+        get_init_array<fmt_node.length, fmt_node.has_zero_padding>();
+    result[len_before_point] = '.';
+
     arg = arg * multiplier;
 
-    for (unsigned i = result.size()-1; i >= result.size() - fmt_node.precision; --i) {
+
+    for (unsigned i = result.size() - 1; i > len_before_point; --i) {
         result[i] = static_cast<int>(arg) % 10 + 48;
-        arg = arg / 10;
+        arg       = arg / 10;
     }
 
-    for (unsigned i = fmt_node.precision + 2; i <= result.size(); ++i) {
+    for (unsigned i = fmt_node.precision + 2; (i <= result.size()) && (arg >= 1); ++i) {
         result[result.size() - i] = static_cast<int>(arg) % 10 + 48;
         arg                       = arg / 10;
     }
 
-    /*
-    for (unsigned i = fmt_node.precision + 1; i <= result.size(); ++i) {
-        result[result.size() - i] = static_cast<int>(arg) % 10 + 48;
-        arg                       = arg / 10;
-    }
-     */
 
     return result;
 }
@@ -93,18 +99,18 @@ constexpr std::array<char, fmt_node.length> format_arg(const char* arg) {
         if (*arg != '\0')
             c = *(arg++);
         else
-            c = '_';
+            c = ' ';
     }
 
     return result;
 }
+
 
 template <auto t_ast, unsigned t_ast_i = 0, unsigned t_result_i = 0,
           typename char_array_t>
 constexpr char_array_t format_args(char_array_t result) {
     return result;
 }
-
 
 template <auto t_ast, unsigned t_ast_i = 0, unsigned t_result_i = 0,
           typename char_array_t, typename first_arg_t, typename... other_args_t>

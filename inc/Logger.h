@@ -41,6 +41,8 @@ public:
         for (const auto& c : formatted_msg) {
             m_output_policy.write(c);
         }
+
+        m_output_policy.write('\n');
     }
 
 private:
