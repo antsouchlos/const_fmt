@@ -18,12 +18,29 @@ struct fmt_node_t {
     int        length           = 6;
     int        precision        = 2;
     FormatType type             = FormatType::s;
+
+    constexpr bool operator==(const fmt_node_t& rhs) const {
+        return (rhs.has_zero_padding == has_zero_padding) &&
+               (rhs.length == length) && (rhs.precision == precision) &&
+               (rhs.type == type);
+    }
 };
 
 
 class ast_node_t {
 public:
     constexpr ast_node_t() {
+    }
+
+    constexpr ast_node_t(char c) : m_is_char(true), m_c(c) {
+    }
+
+    constexpr ast_node_t(fmt_node_t node) : m_is_char(false), m_node(node) {
+    }
+
+    constexpr bool operator==(const ast_node_t& rhs) const {
+        return ((rhs.m_is_char == m_is_char) && (rhs.m_c == m_c)) ||
+                ((rhs.m_is_char != m_is_char) && (rhs.m_node == m_node));
     }
 
     constexpr void set_char(char c) {

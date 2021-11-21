@@ -2,6 +2,9 @@
 #define LOGGER_UTILITY_H
 
 
+#include <cstdlib>
+
+
 namespace detail {
 
 

@@ -3,10 +3,13 @@ project(logger)
 
 set(CMAKE_CXX_STANDARD 20)
 
+
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
 
+
+include_directories(inc)
 
 add_executable(logger src/main.cpp)
 
@@ -18,4 +21,9 @@ else()
 endif()
 
 
-include_directories(inc)
+option(PACKAGE_TESTS "Build the tests" ON)
+if(PACKAGE_TESTS)
+    enable_testing()
+    include(GoogleTest)
+    add_subdirectory(test)
+endif()
