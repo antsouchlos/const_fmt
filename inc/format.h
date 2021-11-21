@@ -49,15 +49,18 @@ constexpr char_array_t format_args(char_array_t result, first_arg_t first_arg, o
     if constexpr(t_ast_i >= t_ast.size()) {
         return result;
     } else {
-        if (t_ast[t_ast_i].is_char()) {
-            result[t_result_i] = t_ast[t_ast_i].get_char();
+        constexpr auto ast_node = t_ast[t_ast_i];
+
+        if (ast_node.is_char()) {
+            result[t_result_i] = ast_node.get_char();
             return format_args<t_ast, t_ast_i+1, t_result_i+1>(result, first_arg, other_args...);
         } else {
-            const auto formatted_arg = format_arg<t_ast[t_ast_i].get_node()>(first_arg);
+            constexpr auto fmt_node = ast_node.get_node();
+            const auto formatted_arg = format_arg<fmt_node>(first_arg);
 
             std::copy(formatted_arg.begin(), formatted_arg.end(), result.begin()+t_result_i);
 
-            return format_args<t_ast, t_ast_i+1, t_result_i+t_ast[t_ast_i].get_node().length>(result, first_arg, other_args...);
+            return format_args<t_ast, t_ast_i+1, t_result_i+fmt_node.length>(result, first_arg, other_args...);
         }
     }
 }
