@@ -6,9 +6,9 @@ using namespace detail;
 
 
 TEST(Format, positive_int) {
-    constexpr std::array<char, 8> control1   = {'0', '0', '0', '2',
-                                                '2', '2', '2', '2'};
-    constexpr std::array<char, 8> formatted1 = format<"{:08}">(22222);
+    constexpr std::array<char, 8> control1   = {'0', '0', '0', '0',
+                                                '0', '0', '0', '2'};
+    constexpr std::array<char, 8> formatted1 = format<"{:08}">(2);
 
     constexpr std::array<char, 8> control2   = {' ', ' ', ' ', '2',
                                                 '2', '2', '2', '2'};

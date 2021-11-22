@@ -251,9 +251,8 @@ constexpr parse_result_t<string_result_t<get_ast_len<s>()>> parse_string() {
             ++i;
 
             auto [is_valid, new_i, format_node] = parse_braces<s>(i);
-            if (!is_valid) {
+            if (!is_valid)
                 return {false, i, {}};
-            }
             i = new_i;
             result.value[ast_position++].set_node(format_node);
 

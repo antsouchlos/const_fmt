@@ -49,7 +49,7 @@ constexpr std::array<char, len> get_init_array() {
 }
 
 
-// TODO: See if this is possible with charconv
+// TODO: See if this is possible with <charconv>
 template <fmt_node_t fmt_node, std::integral arg_t>
 constexpr std::array<char, fmt_node.length> format_arg(arg_t arg) {
     check_fmt_params<fmt_node, arg_t>();
@@ -65,32 +65,30 @@ constexpr std::array<char, fmt_node.length> format_arg(arg_t arg) {
     return result;
 }
 
-// TODO: See if this is possible with charconv
+// TODO: See if this is possible with <charconv>
 template <fmt_node_t fmt_node, std::floating_point arg_t>
 constexpr std::array<char, fmt_node.length> format_arg(arg_t arg) {
     check_fmt_params<fmt_node, arg_t>();
 
-    constexpr unsigned len_before_point =
-        fmt_node.length - fmt_node.precision - 1;
-    constexpr unsigned multiplier = const_pow(10, fmt_node.precision);
+    constexpr unsigned point_index = fmt_node.length - fmt_node.precision - 1;
+    constexpr unsigned multiplier  = const_pow(10, fmt_node.precision);
 
     std::array<char, fmt_node.length> result =
         get_init_array<fmt_node.length, fmt_node.has_zero_padding>();
-    result[len_before_point] = '.';
+    result[point_index] = '.';
 
     arg = arg * multiplier;
 
 
-    for (unsigned i = result.size() - 1; i > len_before_point; --i) {
+    for (unsigned i = result.size() - 1; (i > point_index) && (arg >= 1); --i) {
         result[i] = static_cast<int>(arg) % 10 + 48;
         arg       = arg / 10;
     }
 
-    for (unsigned i = fmt_node.precision + 2; (i <= result.size()) && (arg >= 1); ++i) {
-        result[result.size() - i] = static_cast<int>(arg) % 10 + 48;
-        arg                       = arg / 10;
+    for (unsigned i = point_index - 1; (i >= 0) && (arg >= 1); --i) {
+        result[i] = static_cast<int>(arg) % 10 + 48;
+        arg       = arg / 10;
     }
-
 
     return result;
 }
