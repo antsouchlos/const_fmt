@@ -2,6 +2,9 @@
 #define LOGGER_PARSE_TYPES_H
 
 
+namespace detail {
+
+
 enum class FormatType { s, c, b, B, d, o, x, X, a, A, e, E, f, F, g, G, p };
 
 
@@ -40,13 +43,14 @@ public:
 
     constexpr bool operator==(const ast_node_t& rhs) const {
         return ((rhs.m_is_char == m_is_char) && (rhs.m_c == m_c)) ||
-                ((rhs.m_is_char != m_is_char) && (rhs.m_node == m_node));
+               ((rhs.m_is_char != m_is_char) && (rhs.m_node == m_node));
     }
 
     constexpr void set_char(char c) {
         m_c       = c;
         m_is_char = true;
     }
+
     constexpr void set_node(fmt_node_t node) {
         m_node    = node;
         m_is_char = false;
@@ -55,6 +59,7 @@ public:
     constexpr char get_char() const {
         return m_c;
     }
+
     constexpr fmt_node_t get_node() const {
         return m_node;
     }
@@ -71,6 +76,9 @@ public:
 
 template <std::size_t N>
 using string_result_t = std::array<ast_node_t, N>;
+
+
+} // namespace detail
 
 
 #endif // LOGGER_PARSE_TYPES_H
