@@ -43,7 +43,6 @@ constexpr std::array<char, fmt_node.length> format_arg(arg_t arg) {
 
     unsigned offset = 0;
 
-    // TODO: Does making this branchless make it more efficient?
     if (arg < 0) {
         result[0] = '-';
         arg = -arg;
