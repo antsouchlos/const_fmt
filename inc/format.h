@@ -32,23 +32,6 @@ constexpr int get_output_len() {
     return result;
 }
 
-
-template <fmt_node_t fmt_node>
-constexpr std::array<char, fmt_node.length> get_init_array() {
-    std::array<char, fmt_node.length> result;
-
-    if constexpr (fmt_node.has_zero_padding) {
-        for (auto& c : result)
-            c = '0';
-    } else {
-        for (auto& c : result)
-            c = ' ';
-    }
-
-    return result;
-}
-
-
 // TODO: See if this is possible with <charconv>
 template <fmt_node_t fmt_node, std::integral arg_t>
 constexpr std::array<char, fmt_node.length> format_arg(arg_t arg) {

@@ -2,6 +2,9 @@
 #define LOGGER_PARSE_TYPES_H
 
 
+#include <array>
+
+
 namespace detail {
 
 
