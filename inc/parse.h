@@ -95,17 +95,21 @@ constexpr int get_ast_len() {
  */
 
 
-template <std::size_t N>
-constexpr bool is_digit(ConstString<N> s, unsigned i) {
+template <ConstString s>
+constexpr bool is_digit(unsigned i) {
     return (s[i] > 47) && (s[i] < 58);
 }
 
 
 template <ConstString s>
-constexpr parse_result_t<int> parse_number(unsigned i) {
-    int number = 0;
+constexpr parse_result_t<unsigned> parse_number(unsigned i) {
+    unsigned number = 0;
 
-    while ((i < s.size()) && is_digit(s, i)) {
+    if (!is_digit<s>(i)) {
+        return {false, i, number};
+    }
+
+    while ((i < s.size()) && is_digit<s>(i)) {
         number = number * 10;
         number += (s[i] - 48);
         ++i;
@@ -184,7 +188,7 @@ constexpr parse_result_t<fmt_node_t> parse_fmt_string(unsigned i) {
         result.has_zero_padding = true;
     }
 
-    if (is_digit(s, i)) {
+    if (is_digit<s>(i)) {
         auto [is_valid, new_i, number] = parse_number<s>(i);
         if (!is_valid)
             return {false, i, result};

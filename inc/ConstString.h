@@ -2,6 +2,9 @@
 #define LOGGER_CONSTSTRING_H
 
 
+#include <array>
+
+
 namespace detail {
 
 

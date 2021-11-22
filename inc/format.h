@@ -35,11 +35,17 @@ constexpr int get_output_len() {
 
 template <std::size_t len, bool zeroed>
 constexpr std::array<char, len> get_init_array() {
+    std::array<char, len> result;
+
     if constexpr (zeroed) {
-        return {'0'};
+        for (auto& c : result)
+            c = '0';
     } else {
-        return {' '};
+        for (auto& c : result)
+            c = ' ';
     }
+
+    return result;
 }
 
 
@@ -148,7 +154,7 @@ constexpr std::array<char, detail::get_output_len<s>()> format(args_t... args) {
     constexpr auto parse_result = detail::parse_string<s>();
     static_assert(parse_result.is_valid, "Syntax error in format string");
 
-    std::array<char, detail::get_output_len<s>()> result;
+    std::array<char, detail::get_output_len<s>()> result = {};
 
     return detail::format_args<parse_result.value>(result, args...);
 }

@@ -18,4 +18,5 @@ endmacro()
 
 package_add_test(utility_test src/utility.cpp)
 package_add_test(parse_test src/parse.cpp)
+package_add_test(format_test src/format.cpp)
 
