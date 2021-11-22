@@ -2,7 +2,7 @@
 #define LOGGER_UTILITY_H
 
 
-#include <cstdlib>
+#include "parse_types.h"
 
 
 namespace detail {
