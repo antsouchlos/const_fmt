@@ -33,21 +33,32 @@ constexpr int get_output_len() {
 }
 
 // TODO: See if this is possible with <charconv>
+// TODO: Steal some code from fmtlib
 template <fmt_node_t fmt_node, std::integral arg_t>
 constexpr std::array<char, fmt_node.length> format_arg(arg_t arg) {
     check_fmt_params<fmt_node, arg_t>();
 
     auto result = get_init_array<fmt_node>();
 
-    for (unsigned i = 1; (i <= result.size()) && arg > 0; ++i) {
-        result[result.size() - i] = arg % 10 + 48;
-        arg                       = arg / 10;
+    unsigned offset = 0;
+
+    // TODO: Does making this branchless make it more efficient?
+    if (arg < 0) {
+        result[0] = '-';
+        arg = -arg;
+        ++offset;
+    }
+
+    for (int i = result.size() - 1; (i >= offset) && (arg > 0); --i) {
+        result[i] = arg % 10 + 48;
+        arg       = arg / 10;
     }
 
     return result;
 }
 
 // TODO: See if this is possible with <charconv>
+// TODO: Steal some code from fmtlib
 template <fmt_node_t fmt_node, std::floating_point arg_t>
 constexpr std::array<char, fmt_node.length> format_arg(arg_t arg) {
     check_fmt_params<fmt_node, arg_t>();
@@ -76,6 +87,7 @@ constexpr std::array<char, fmt_node.length> format_arg(arg_t arg) {
     return result;
 }
 
+// TODO: Steal some code from fmtlib
 template <fmt_node_t fmt_node>
 constexpr std::array<char, fmt_node.length> format_arg(const char* arg) {
     check_fmt_params<fmt_node, const char*>();
