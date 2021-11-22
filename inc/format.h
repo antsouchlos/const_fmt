@@ -33,11 +33,11 @@ constexpr int get_output_len() {
 }
 
 
-template <std::size_t len, bool zeroed>
-constexpr std::array<char, len> get_init_array() {
-    std::array<char, len> result;
+template <fmt_node_t fmt_node>
+constexpr std::array<char, fmt_node.length> get_init_array() {
+    std::array<char, fmt_node.length> result;
 
-    if constexpr (zeroed) {
+    if constexpr (fmt_node.has_zero_padding) {
         for (auto& c : result)
             c = '0';
     } else {
@@ -54,8 +54,7 @@ template <fmt_node_t fmt_node, std::integral arg_t>
 constexpr std::array<char, fmt_node.length> format_arg(arg_t arg) {
     check_fmt_params<fmt_node, arg_t>();
 
-    std::array<char, fmt_node.length> result =
-        get_init_array<fmt_node.length, fmt_node.has_zero_padding>();
+    auto result = get_init_array<fmt_node>();
 
     for (unsigned i = 1; (i <= result.size()) && arg > 0; ++i) {
         result[result.size() - i] = arg % 10 + 48;
@@ -73,19 +72,20 @@ constexpr std::array<char, fmt_node.length> format_arg(arg_t arg) {
     constexpr unsigned point_index = fmt_node.length - fmt_node.precision - 1;
     constexpr unsigned multiplier  = const_pow(10, fmt_node.precision);
 
-    std::array<char, fmt_node.length> result =
-        get_init_array<fmt_node.length, fmt_node.has_zero_padding>();
+    auto result         = get_init_array<fmt_node>();
     result[point_index] = '.';
 
+    
     arg = arg * multiplier;
 
+    for (int i = result.size() - 1;
+         (i > static_cast<int>(point_index)) && (arg >= 1); --i) {
 
-    for (unsigned i = result.size() - 1; (i > point_index) && (arg >= 1); --i) {
         result[i] = static_cast<int>(arg) % 10 + 48;
         arg       = arg / 10;
     }
 
-    for (unsigned i = point_index - 1; (i >= 0) && (arg >= 1); --i) {
+    for (int i = point_index - 1; (i >= 0) && (arg >= 1); --i) {
         result[i] = static_cast<int>(arg) % 10 + 48;
         arg       = arg / 10;
     }
