@@ -53,8 +53,7 @@ constexpr unsigned count_braces() {
     unsigned result = 0;
 
     for (unsigned i = 0; i < s.size(); ++i) {
-        if (s[i] == '{')
-            ++result;
+        if (s[i] == '{') ++result;
     }
 
     return result;
@@ -190,8 +189,7 @@ constexpr parse_result_t<fmt_node_t> parse_fmt_string(unsigned i) {
 
     if (is_digit<s>(i)) {
         auto [is_valid, new_i, number] = parse_number<s>(i);
-        if (!is_valid)
-            return {false, i, result};
+        if (!is_valid) return {false, i, result};
         i             = new_i;
         result.length = number;
     }
@@ -199,16 +197,14 @@ constexpr parse_result_t<fmt_node_t> parse_fmt_string(unsigned i) {
     if (s[i] == '.') {
         ++i;
         auto [is_valid, new_i, number] = parse_number<s>(i);
-        if (!is_valid)
-            return {false, i, result};
+        if (!is_valid) return {false, i, result};
         i                = new_i;
         result.precision = number;
     }
 
     if (s[i] != '}') {
         auto [is_valid, new_i, type] = parse_type<s>(i);
-        if (!is_valid)
-            return {false, i, result};
+        if (!is_valid) return {false, i, result};
         i           = new_i;
         result.type = type;
     }
@@ -225,8 +221,7 @@ constexpr parse_result_t<fmt_node_t> parse_braces(unsigned i) {
         ++i;
 
         auto [is_valid, new_i, format_node] = parse_fmt_string<s>(i);
-        if (!is_valid)
-            return {false, i, {}};
+        if (!is_valid) return {false, i, {}};
         i = new_i;
 
         if (s[i] == '}') {
@@ -251,8 +246,7 @@ constexpr parse_result_t<string_result_t<get_ast_len<s>()>> parse_string() {
             ++i;
 
             auto [is_valid, new_i, format_node] = parse_braces<s>(i);
-            if (!is_valid)
-                return {false, i, {}};
+            if (!is_valid) return {false, i, {}};
             i = new_i;
             result.value[ast_position++].set_node(format_node);
 

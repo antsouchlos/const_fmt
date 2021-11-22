@@ -75,7 +75,7 @@ constexpr std::array<char, fmt_node.length> format_arg(arg_t arg) {
     auto result         = get_init_array<fmt_node>();
     result[point_index] = '.';
 
-    
+
     arg = arg * multiplier;
 
     for (int i = result.size() - 1;
