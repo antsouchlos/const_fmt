@@ -128,5 +128,19 @@ constexpr std::array<char, detail::get_output_len<s>()> format(args_t... args) {
     return result;
 }
 
+template<detail::ConstString t_s>
+class fmt_literal_obj_t {
+    public:
+        template<typename... args_t>
+        constexpr auto operator()(args_t... args) {
+            return format<t_s>(args...);
+        }
+};
+
+template <detail::ConstString t_s>
+constexpr auto operator""_const_fmt() {
+    return fmt_literal_obj_t<t_s>{};
+}
+
 
 #endif // LOGGER_FORMAT_H
