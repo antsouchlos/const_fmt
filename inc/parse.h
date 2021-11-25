@@ -2,7 +2,6 @@
 #define LOGGER_PARSE_H
 
 
-#include "ConstString.h"
 #include "types.h"
 
 

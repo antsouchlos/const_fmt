@@ -4,7 +4,7 @@
 
 
 int main() {
-    constexpr auto formatted = format<"Test: {:012.5} {} {:8}">(142.4334, "abc", -1234);
+    constexpr auto formatted = format<"Test: {:012.5} {} {:8}">(142.4334, "abcdef", -1234);
 
     for (const auto& c : formatted)
         std::cout << c;

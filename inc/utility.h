@@ -2,6 +2,8 @@
 #define LOGGER_UTILITY_H
 
 
+#include <cstring>
+
 #include "types.h"
 
 
@@ -92,6 +94,29 @@ drop_first(std::array<elem_t, t_n> array) {
     std::copy(array.begin() + 1, array.end(), result.begin());
 
     return result;
+}
+
+
+template <auto t_ast>
+consteval int get_ast_output_len() {
+    unsigned result = 0;
+
+    for (const auto& ast_node : t_ast) {
+        if (ast_node.is_char())
+            ++result;
+        else
+            result += ast_node.get_node().length;
+    }
+
+    return result;
+}
+
+constexpr std::size_t const_strlen(const char* arg) {
+    if (std::is_constant_evaluated()) {
+        return *arg ? 1 + const_strlen(arg + 1) : 0;
+    } else {
+        return strlen(arg);
+    }
 }
 
 
