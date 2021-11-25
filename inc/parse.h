@@ -119,63 +119,46 @@ constexpr parse_result_t<unsigned> parse_number(unsigned i) {
 
 template <ConstString s>
 constexpr parse_result_t<FormatType> parse_type(unsigned i) {
-    if (s[i] == 's') { // string
-        ++i;
-        return {true, i, FormatType::s};
-    } else if (s[i] == 'c') { // char
-        ++i;
-        return {true, i, FormatType::c};
-    } else if (s[i] == 'b') { // int
-        ++i;
-        return {true, i, FormatType::b};
-    } else if (s[i] == 'B') {
-        ++i;
-        return {true, i, FormatType::B};
-        //    } else if (s[i] == 'c') {
-        //        ++i;
-        //        return {true, i, FormatType::c};
-    } else if (s[i] == 'd') {
-        ++i;
-        return {true, i, FormatType::d};
-    } else if (s[i] == 'o') {
-        ++i;
-        return {true, i, FormatType::o};
-    } else if (s[i] == 'x') {
-        ++i;
-        return {true, i, FormatType::x};
-    } else if (s[i] == 'X') {
-        ++i;
-        return {true, i, FormatType::X};
-    } else if (s[i] == 'a') { // float
-        ++i;
-        return {true, i, FormatType::a};
-    } else if (s[i] == 'A') {
-        ++i;
-        return {true, i, FormatType::A};
-    } else if (s[i] == 'e') {
-        ++i;
-        return {true, i, FormatType::e};
-    } else if (s[i] == 'E') {
-        ++i;
-        return {true, i, FormatType::E};
-    } else if (s[i] == 'f') {
-        ++i;
-        return {true, i, FormatType::f};
-    } else if (s[i] == 'F') {
-        ++i;
-        return {true, i, FormatType::F};
-    } else if (s[i] == 'g') {
-        ++i;
-        return {true, i, FormatType::g};
-    } else if (s[i] == 'G') {
-        ++i;
-        return {true, i, FormatType::G};
-    } else if (s[i] == 'p') { // pointer
-        ++i;
-        return {true, i, FormatType::p};
+    ++i;
+    switch (s[i]) {
+        case 's':
+            return {true, i, FormatType::s};
+        case 'c':
+            return {true, i, FormatType::c};
+        case 'b':
+            return {true, i, FormatType::b};
+        case 'B':
+            return {true, i, FormatType::B};
+        case 'd':
+            return {true, i, FormatType::d};
+        case 'o':
+            return {true, i, FormatType::o};
+        case 'x':
+            return {true, i, FormatType::x};
+        case 'X':
+            return {true, i, FormatType::X};
+        case 'a':
+            return {true, i, FormatType::a};
+        case 'A':
+            return {true, i, FormatType::A};
+        case 'e':
+            return {true, i, FormatType::e};
+        case 'E':
+            return {true, i, FormatType::E};
+        case 'f':
+            return {true, i, FormatType::f};
+        case 'F':
+            return {true, i, FormatType::F};
+        case 'g':
+            return {true, i, FormatType::g};
+        case 'G':
+            return {true, i, FormatType::G};
+        case 'p':
+            return {true, i, FormatType::p};
+        default:
+            --i;
+            return {false, i, FormatType::s};
     }
-
-    return {false, i, FormatType::s};
 }
 
 template <ConstString s>
