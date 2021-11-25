@@ -1,11 +1,18 @@
-#ifndef LOGGER_PARSE_TYPES_H
-#define LOGGER_PARSE_TYPES_H
+#ifndef LOGGER_TYPES_H
+#define LOGGER_TYPES_H
 
 
 #include <array>
 
 
 namespace detail {
+
+
+/*
+ *
+ * Types used mainly in parsing
+ *
+ */
 
 
 enum class FormatType { s, c, b, B, d, o, x, X, a, A, e, E, f, F, g, G, p };
@@ -81,7 +88,24 @@ template <std::size_t N>
 using string_result_t = std::array<ast_node_t, N>;
 
 
+/*
+ *
+ * Types used mainly in formatting
+ *
+ */
+
+
+struct fmt_data_t {
+    bool        has_zero_padding = 0;
+    std::size_t length           = 0;
+    std::size_t precision        = 0;
+    FormatType  type;
+
+    std::size_t position = 0;
+};
+
+
 } // namespace detail
 
 
-#endif // LOGGER_PARSE_TYPES_H
+#endif // LOGGER_TYPES_H
