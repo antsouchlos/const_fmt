@@ -138,7 +138,7 @@ class fmt_literal_obj_t {
 };
 
 template <detail::ConstString t_s>
-constexpr auto operator""_const_fmt() {
+constexpr auto operator""_fmt() {
     return fmt_literal_obj_t<t_s>{};
 }
 

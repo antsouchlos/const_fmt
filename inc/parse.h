@@ -118,44 +118,42 @@ constexpr parse_result_t<unsigned> parse_number(unsigned i) {
 
 template <ConstString s>
 constexpr parse_result_t<FormatType> parse_type(unsigned i) {
-    ++i;
     switch (s[i]) {
         case 's':
-            return {true, i, FormatType::s};
+            return {true, ++i, FormatType::s};
         case 'c':
-            return {true, i, FormatType::c};
+            return {true, ++i, FormatType::c};
         case 'b':
-            return {true, i, FormatType::b};
+            return {true, ++i, FormatType::b};
         case 'B':
-            return {true, i, FormatType::B};
+            return {true, ++i, FormatType::B};
         case 'd':
-            return {true, i, FormatType::d};
+            return {true, ++i, FormatType::d};
         case 'o':
-            return {true, i, FormatType::o};
+            return {true, ++i, FormatType::o};
         case 'x':
-            return {true, i, FormatType::x};
+            return {true, ++i, FormatType::x};
         case 'X':
-            return {true, i, FormatType::X};
+            return {true, ++i, FormatType::X};
         case 'a':
-            return {true, i, FormatType::a};
+            return {true, ++i, FormatType::a};
         case 'A':
-            return {true, i, FormatType::A};
+            return {true, ++i, FormatType::A};
         case 'e':
-            return {true, i, FormatType::e};
+            return {true, ++i, FormatType::e};
         case 'E':
-            return {true, i, FormatType::E};
+            return {true, ++i, FormatType::E};
         case 'f':
-            return {true, i, FormatType::f};
+            return {true, ++i, FormatType::f};
         case 'F':
-            return {true, i, FormatType::F};
+            return {true, ++i, FormatType::F};
         case 'g':
-            return {true, i, FormatType::g};
+            return {true, ++i, FormatType::g};
         case 'G':
-            return {true, i, FormatType::G};
+            return {true, ++i, FormatType::G};
         case 'p':
-            return {true, i, FormatType::p};
+            return {true, ++i, FormatType::p};
         default:
-            --i;
             return {false, i, FormatType::s};
     }
 }
