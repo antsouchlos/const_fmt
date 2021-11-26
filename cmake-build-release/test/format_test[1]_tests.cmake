@@ -1,0 +1,5 @@
+add_test( Format.positive_int /home/andreas/git/logger/cmake-build-release/test/format_test [==[--gtest_filter=Format.positive_int]==] --gtest_also_run_disabled_tests)
+set_tests_properties( Format.positive_int PROPERTIES WORKING_DIRECTORY /home/andreas/git/logger/cmake-build-release/test SKIP_REGULAR_EXPRESSION [==[\[  SKIPPED \]]==] VS_DEBUGGER_WORKING_DIRECTORY)
+add_test( Format.negative_int /home/andreas/git/logger/cmake-build-release/test/format_test [==[--gtest_filter=Format.negative_int]==] --gtest_also_run_disabled_tests)
+set_tests_properties( Format.negative_int PROPERTIES WORKING_DIRECTORY /home/andreas/git/logger/cmake-build-release/test SKIP_REGULAR_EXPRESSION [==[\[  SKIPPED \]]==] VS_DEBUGGER_WORKING_DIRECTORY)
+set( format_test_TESTS Format.positive_int Format.negative_int)

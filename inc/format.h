@@ -43,15 +43,17 @@ constexpr inline void check_fmt_params() {
 // TODO: Error handling
 template <fmt_data_t fmt_data, std::integral arg_t>
 constexpr inline void format_arg(char* dest, arg_t arg) {
-    auto error_array = get_init_array<fmt_data.length>('f');
+    constexpr auto error_array = get_init_array<fmt_data.length>('f');
 
-    detail::format_integral(dest, arg, fmt_data);
+    detail::format_int(dest, arg, fmt_data);
 };
 // TODO: Error handling
 template <fmt_data_t fmt_data, std::floating_point arg_t>
-constexpr inline void format_arg(char* dest, arg_t) {
+constexpr inline void format_arg(char* dest, arg_t arg) {
     *(dest) = 'f';
     *(dest + fmt_data.length - fmt_data.precision - 1) = '.';
+
+    //detail::format_float(dest, arg, fmt_data);
 };
 // TODO: Error handling
 template<fmt_data_t fmt_data>

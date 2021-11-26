@@ -11,6 +11,8 @@
  */
 
 
+#include <cstdint>
+
 #include "utility.h"
 
 
@@ -22,6 +24,12 @@ namespace detail {
  * Utility functions
  *
  */
+
+
+#define FMT_POWERS_OF_10(factor)                                             \
+  factor * 10, (factor)*100, (factor)*1000, (factor)*10000, (factor)*100000, \
+      (factor)*1000000, (factor)*10000000, (factor)*100000000,               \
+      (factor)*1000000000
 
 
 // Converts value in the range [0, 100) to a string.
@@ -40,13 +48,12 @@ constexpr inline void copy2(char* dst, const char* src) {
         std::memcpy(dst, src, 2);
         return;
     }
-
     *dst++ = static_cast<char>(*src++);
     *dst   = static_cast<char>(*src);
 }
 
-template <typename UInt>
-constexpr inline void format_decimal(char* out, UInt value, int size) {
+template <typename uint_t>
+constexpr inline void format_decimal(char* out, uint_t value, int size) {
     out += size;
     while (value >= 100) {
         out -= 2;
@@ -60,6 +67,40 @@ constexpr inline void format_decimal(char* out, UInt value, int size) {
     copy2(out, digits2(static_cast<size_t>(value)));
 }
 
+template <typename T>
+constexpr int count_digits_fallback(T n) {
+    int count = 1;
+    for (;;) {
+        if (n < 10) return count;
+        if (n < 100) return count + 1;
+        if (n < 1000) return count + 2;
+        if (n < 10000) return count + 3;
+        n /= 10000u;
+        count += 4;
+    }
+}
+
+inline int do_count_digits(uint64_t n) {
+  // Maps bsr(n) to ceil(log10(pow(2, bsr(n) + 1) - 1)).
+  static constexpr uint8_t bsr2log10[] = {
+      1,  1,  1,  2,  2,  2,  3,  3,  3,  4,  4,  4,  4,  5,  5,  5,
+      6,  6,  6,  7,  7,  7,  7,  8,  8,  8,  9,  9,  9,  10, 10, 10,
+      10, 11, 11, 11, 12, 12, 12, 13, 13, 13, 13, 14, 14, 14, 15, 15,
+      15, 16, 16, 16, 16, 17, 17, 17, 18, 18, 18, 19, 19, 19, 19, 20};
+  auto t = bsr2log10[__builtin_clzll(n | 1) ^ 63];
+  static constexpr const uint64_t zero_or_powers_of_10[] = {
+      0, 0, FMT_POWERS_OF_10(1U), FMT_POWERS_OF_10(1000000000ULL),
+      10000000000000000000ULL};
+  return t - (n < zero_or_powers_of_10[t]);
+}
+
+constexpr inline auto count_digits(uint64_t n) -> int {
+    if (!std::is_constant_evaluated()) {
+        return do_count_digits(n);
+    }
+    return count_digits_fallback(n);
+}
+
 
 /*
  *
@@ -69,14 +110,12 @@ constexpr inline void format_decimal(char* out, UInt value, int size) {
 
 
 template <std::unsigned_integral uint_t>
-constexpr inline void format_integral(char* out, uint_t value,
-                                      fmt_data_t fmt_node) {
+constexpr inline void format_int(char* out, uint_t value, fmt_data_t fmt_node) {
     format_decimal(out, value, fmt_node.length);
 }
 
 template <std::signed_integral uint_t>
-constexpr inline void format_integral(char* out, uint_t value,
-                                      fmt_data_t fmt_node) {
+constexpr inline void format_int(char* out, uint_t value, fmt_data_t fmt_node) {
     if (value < 0) value = -value;
     format_decimal(out, value, fmt_node.length);
 }
@@ -90,8 +129,8 @@ constexpr inline void format_integral(char* out, uint_t value,
 
 
 template <std::floating_point float_t>
-constexpr inline void format_floating_point(char* out, float_t value,
-                                      fmt_data_t fmt_node) {
+constexpr inline void format_float(char* out, float_t value,
+                                   fmt_data_t fmt_node) {
     // TODO
 }
 
