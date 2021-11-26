@@ -1,5 +1,0 @@
-if(EXISTS "/home/andreas/git/logger/cmake-build-release/test/parse_test[1]_tests.cmake")
-  include("/home/andreas/git/logger/cmake-build-release/test/parse_test[1]_tests.cmake")
-else()
-  add_test(parse_test_NOT_BUILT parse_test_NOT_BUILT)
-endif()

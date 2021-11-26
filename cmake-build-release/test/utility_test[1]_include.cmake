@@ -1,5 +1,0 @@
-if(EXISTS "/home/andreas/git/logger/cmake-build-release/test/utility_test[1]_tests.cmake")
-  include("/home/andreas/git/logger/cmake-build-release/test/utility_test[1]_tests.cmake")
-else()
-  add_test(utility_test_NOT_BUILT utility_test_NOT_BUILT)
-endif()
