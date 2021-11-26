@@ -20,7 +20,7 @@ namespace detail {
 
 
 template <ConstString s>
-constexpr int get_output_len() {
+constexpr inline int get_output_len() {
     constexpr auto parse_result = parse_string<s>();
     static_assert(parse_result.is_valid, "Syntax error in format string");
 
@@ -28,7 +28,7 @@ constexpr int get_output_len() {
 }
 
 template <fmt_node_t fmt_node, typename T>
-constexpr void check_fmt_params() {
+constexpr inline void check_fmt_params() {
     static_assert(fmt_node.length > fmt_node.precision + 1,
                   "Insufficient length for desired precision");
 }
@@ -40,19 +40,21 @@ constexpr void check_fmt_params() {
  *
  */
 
-
+// TODO: Error handling
 template <std::integral arg_t>
-constexpr void format_arg(char* dest, fmt_data_t fmt_data, arg_t arg) {
+constexpr inline void format_arg(char* dest, fmt_data_t fmt_data, arg_t arg) {
+//    constexpr auto error_array = get_init_array<fmt_data.length>('f');
+
     detail::format_integral(dest, arg, fmt_data);
 };
-
+// TODO: Error handling
 template <std::floating_point arg_t>
-constexpr void format_arg(char* dest, fmt_data_t fmt_data, arg_t) {
+constexpr inline void format_arg(char* dest, fmt_data_t fmt_data, arg_t) {
     *(dest) = 'f';
     *(dest + fmt_data.length - fmt_data.precision - 1) = '.';
 };
 // TODO: Error handling
-constexpr void format_arg(char* dest, fmt_data_t fmt_data, const char* arg) {
+constexpr inline void format_arg(char* dest, fmt_data_t fmt_data, const char* arg) {
     const std::size_t len = const_strlen(arg);
     if (len > fmt_data.length) return;
 
@@ -68,20 +70,21 @@ constexpr void format_arg(char* dest, fmt_data_t fmt_data, const char* arg) {
 };
 
 
+// End of recursion
 template <auto ast>
-constexpr void format_args(char*) {
+constexpr inline void format_args(char*) {
 }
 
 template <auto fmt_data_array, typename first_arg_t, typename... args_t>
-constexpr void format_args(char* dest, first_arg_t first_arg, args_t... args) {
+constexpr inline void format_args(char* dest, first_arg_t first_arg, args_t... args) {
     format_arg(dest + fmt_data_array[0].position, fmt_data_array[0], first_arg);
     format_args<drop_first(fmt_data_array)>(dest, args...);
 }
 
 
 template <auto ast>
-consteval std::array<char, get_ast_output_len<ast>()> get_preproc_string() {
-    auto result = get_zero_array<get_ast_output_len<ast>()>();
+consteval inline std::array<char, get_ast_output_len<ast>()> get_preproc_string() {
+    auto result = get_init_array<get_ast_output_len<ast>()>('0');
 
     int i = 0;
 
@@ -107,7 +110,7 @@ consteval std::array<char, get_ast_output_len<ast>()> get_preproc_string() {
 
 
 template <detail::ConstString s, typename... args_t>
-constexpr auto format(args_t... args) {
+constexpr inline auto format(args_t... args) {
     constexpr auto ast      = detail::parse_string<s>().value;
     constexpr auto fmt_data = detail::get_fmt_data<ast>();
 

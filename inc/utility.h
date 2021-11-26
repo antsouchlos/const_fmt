@@ -10,7 +10,7 @@
 namespace detail {
 
 
-constexpr std::size_t const_pow(std::size_t base, std::size_t pow) {
+constexpr inline std::size_t const_pow(std::size_t base, std::size_t pow) {
     if (pow == 0)
         return 1;
     else
@@ -18,34 +18,44 @@ constexpr std::size_t const_pow(std::size_t base, std::size_t pow) {
 }
 
 
+//template <std::size_t t_n>
+//constexpr std::array<char, t_n> get_zero_array() {
+//    std::array<char, t_n> result;
+//
+//    for (auto& c : result)
+//        c = '0';
+//
+//    return result;
+//}
+
 template <std::size_t t_n>
-constexpr std::array<char, t_n> get_zero_array() {
+constexpr inline std::array<char, t_n> get_init_array(char val) {
     std::array<char, t_n> result;
 
     for (auto& c : result)
-        c = '0';
+        c = val;
 
     return result;
 }
 
-template <fmt_node_t fmt_node>
-constexpr std::array<char, fmt_node.length> get_init_array() {
-    std::array<char, fmt_node.length> result;
-
-    if constexpr (fmt_node.has_zero_padding) {
-        for (auto& c : result)
-            c = '0';
-    } else {
-        for (auto& c : result)
-            c = ' ';
-    }
-
-    return result;
-}
+//template <fmt_node_t fmt_node>
+//constexpr std::array<char, fmt_node.length> get_init_array() {
+//    std::array<char, fmt_node.length> result;
+//
+//    if constexpr (fmt_node.has_zero_padding) {
+//        for (auto& c : result)
+//            c = '0';
+//    } else {
+//        for (auto& c : result)
+//            c = ' ';
+//    }
+//
+//    return result;
+//}
 
 
 template <auto ast>
-consteval std::size_t count_ast_format_nodes() {
+consteval inline std::size_t count_ast_format_nodes() {
     std::size_t result = 0;
 
     for (const auto& node : ast)
@@ -56,7 +66,7 @@ consteval std::size_t count_ast_format_nodes() {
 
 
 template <auto ast>
-consteval std::array<fmt_data_t, count_ast_format_nodes<ast>()> get_fmt_data() {
+consteval inline std::array<fmt_data_t, count_ast_format_nodes<ast>()> get_fmt_data() {
     std::array<fmt_data_t, count_ast_format_nodes<ast>()> result = {};
 
     std::size_t position = 0;
@@ -84,7 +94,7 @@ consteval std::array<fmt_data_t, count_ast_format_nodes<ast>()> get_fmt_data() {
 
 
 template <typename elem_t, std::size_t t_n>
-consteval std::array<elem_t, t_n - 1>
+consteval inline std::array<elem_t, t_n - 1>
 drop_first(std::array<elem_t, t_n> array) {
     static_assert(t_n > 0,
                   "Can't drop first element of array with no elements");
@@ -98,7 +108,7 @@ drop_first(std::array<elem_t, t_n> array) {
 
 
 template <auto t_ast>
-consteval int get_ast_output_len() {
+consteval inline int get_ast_output_len() {
     unsigned result = 0;
 
     for (const auto& ast_node : t_ast) {
@@ -111,7 +121,7 @@ consteval int get_ast_output_len() {
     return result;
 }
 
-constexpr std::size_t const_strlen(const char* arg) {
+constexpr inline  std::size_t const_strlen(const char* arg) {
     if (std::is_constant_evaluated()) {
         return *arg ? 1 + const_strlen(arg + 1) : 0;
     } else {

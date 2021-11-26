@@ -48,7 +48,7 @@ namespace detail {
 
 
 template <ConstString s>
-constexpr unsigned count_braces() {
+constexpr inline unsigned count_braces() {
     unsigned result = 0;
 
     for (unsigned i = 0; i < s.size(); ++i) {
@@ -59,7 +59,7 @@ constexpr unsigned count_braces() {
 }
 
 template <ConstString s>
-constexpr unsigned strlen_braces() {
+constexpr inline unsigned strlen_braces() {
     unsigned result = 0;
 
     bool brace_open = false;
@@ -81,7 +81,7 @@ constexpr unsigned strlen_braces() {
 }
 
 template <ConstString s>
-constexpr int get_ast_len() {
+constexpr inline int get_ast_len() {
     return (s.size() - strlen_braces<s>() + count_braces<s>());
 }
 
@@ -94,13 +94,13 @@ constexpr int get_ast_len() {
 
 
 template <ConstString s>
-constexpr bool is_digit(unsigned i) {
+constexpr inline bool is_digit(unsigned i) {
     return (s[i] > 47) && (s[i] < 58);
 }
 
 
 template <ConstString s>
-constexpr parse_result_t<unsigned> parse_number(unsigned i) {
+constexpr inline parse_result_t<unsigned> parse_number(unsigned i) {
     unsigned number = 0;
 
     if (!is_digit<s>(i)) {
@@ -117,7 +117,7 @@ constexpr parse_result_t<unsigned> parse_number(unsigned i) {
 }
 
 template <ConstString s>
-constexpr parse_result_t<FormatType> parse_type(unsigned i) {
+constexpr inline parse_result_t<FormatType> parse_type(unsigned i) {
     switch (s[i]) {
         case 's':
             return {true, ++i, FormatType::s};
@@ -159,7 +159,7 @@ constexpr parse_result_t<FormatType> parse_type(unsigned i) {
 }
 
 template <ConstString s>
-constexpr parse_result_t<fmt_node_t> parse_fmt_string(unsigned i) {
+constexpr inline parse_result_t<fmt_node_t> parse_fmt_string(unsigned i) {
     fmt_node_t result;
 
     if (s[i] == '0') {
@@ -193,7 +193,7 @@ constexpr parse_result_t<fmt_node_t> parse_fmt_string(unsigned i) {
 }
 
 template <ConstString s>
-constexpr parse_result_t<fmt_node_t> parse_braces(unsigned i) {
+constexpr inline parse_result_t<fmt_node_t> parse_braces(unsigned i) {
     if (s[i] == '}') {
         ++i;
         return {true, i, {}};
@@ -214,7 +214,7 @@ constexpr parse_result_t<fmt_node_t> parse_braces(unsigned i) {
 }
 
 template <ConstString s>
-constexpr parse_result_t<string_result_t<get_ast_len<s>()>> parse_string() {
+constexpr inline parse_result_t<string_result_t<get_ast_len<s>()>> parse_string() {
     parse_result_t<string_result_t<get_ast_len<s>()>> result;
     result.is_valid = true;
 

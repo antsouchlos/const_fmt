@@ -47,9 +47,6 @@ constexpr inline void copy2(char* dst, const char* src) {
 
 template <typename UInt>
 constexpr inline void format_decimal(char* out, UInt value, int size) {
-    // TODO: Error handling (Maybe calculate "ffff..." as a constant expression
-    //       and then set the out pointer with a branchless statement)
-
     out += size;
     while (value >= 100) {
         out -= 2;
