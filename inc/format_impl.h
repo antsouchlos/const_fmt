@@ -90,7 +90,7 @@ constexpr inline void format_integral(char* out, uint_t value,
 
 
 template <std::floating_point float_t>
-constexpr inline void format_integral(char* out, float_t value,
+constexpr inline void format_floating_point(char* out, float_t value,
                                       fmt_data_t fmt_node) {
     // TODO
 }

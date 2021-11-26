@@ -41,20 +41,21 @@ constexpr inline void check_fmt_params() {
  */
 
 // TODO: Error handling
-template <std::integral arg_t>
-constexpr inline void format_arg(char* dest, fmt_data_t fmt_data, arg_t arg) {
-//    constexpr auto error_array = get_init_array<fmt_data.length>('f');
+template <fmt_data_t fmt_data, std::integral arg_t>
+constexpr inline void format_arg(char* dest, arg_t arg) {
+    auto error_array = get_init_array<fmt_data.length>('f');
 
     detail::format_integral(dest, arg, fmt_data);
 };
 // TODO: Error handling
-template <std::floating_point arg_t>
-constexpr inline void format_arg(char* dest, fmt_data_t fmt_data, arg_t) {
+template <fmt_data_t fmt_data, std::floating_point arg_t>
+constexpr inline void format_arg(char* dest, arg_t) {
     *(dest) = 'f';
     *(dest + fmt_data.length - fmt_data.precision - 1) = '.';
 };
 // TODO: Error handling
-constexpr inline void format_arg(char* dest, fmt_data_t fmt_data, const char* arg) {
+template<fmt_data_t fmt_data>
+constexpr inline void format_arg(char* dest, const char* arg) {
     const std::size_t len = const_strlen(arg);
     if (len > fmt_data.length) return;
 
@@ -77,7 +78,7 @@ constexpr inline void format_args(char*) {
 
 template <auto fmt_data_array, typename first_arg_t, typename... args_t>
 constexpr inline void format_args(char* dest, first_arg_t first_arg, args_t... args) {
-    format_arg(dest + fmt_data_array[0].position, fmt_data_array[0], first_arg);
+    format_arg<fmt_data_array[0]>(dest + fmt_data_array[0].position, first_arg);
     format_args<drop_first(fmt_data_array)>(dest, args...);
 }
 

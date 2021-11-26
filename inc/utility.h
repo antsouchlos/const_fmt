@@ -18,18 +18,8 @@ constexpr inline std::size_t const_pow(std::size_t base, std::size_t pow) {
 }
 
 
-//template <std::size_t t_n>
-//constexpr std::array<char, t_n> get_zero_array() {
-//    std::array<char, t_n> result;
-//
-//    for (auto& c : result)
-//        c = '0';
-//
-//    return result;
-//}
-
 template <std::size_t t_n>
-constexpr inline std::array<char, t_n> get_init_array(char val) {
+consteval inline std::array<char, t_n> get_init_array(char val) {
     std::array<char, t_n> result;
 
     for (auto& c : result)
@@ -37,21 +27,6 @@ constexpr inline std::array<char, t_n> get_init_array(char val) {
 
     return result;
 }
-
-//template <fmt_node_t fmt_node>
-//constexpr std::array<char, fmt_node.length> get_init_array() {
-//    std::array<char, fmt_node.length> result;
-//
-//    if constexpr (fmt_node.has_zero_padding) {
-//        for (auto& c : result)
-//            c = '0';
-//    } else {
-//        for (auto& c : result)
-//            c = ' ';
-//    }
-//
-//    return result;
-//}
 
 
 template <auto ast>
