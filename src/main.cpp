@@ -1,14 +1,14 @@
-#include <iostream>
+//#include <iostream>
 
 #include <Logger.h>
 
 
-int main() {
-    constexpr auto formatted = "Test: {:012.5} {:6} {:8}"_fmt(142.4334, "abcdef", -1234);
+int main(int argc, char* argv[]) {
+    auto formatted = "Test: {:12} {:012.5} {:8}"_fmt(argv[0], argc, -1234);
 
     for (const auto& c : formatted)
         std::cout << c;
     std::cout << std::endl;
 
-    return 0;
+    return formatted[6];
 }

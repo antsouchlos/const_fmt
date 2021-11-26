@@ -2,9 +2,11 @@
 #define LOGGER_FORMAT_H
 
 
+#include <cstring>
+
 #include "parse.h"
 #include "utility.h"
-#include <cstring>
+#include "format_impl.h"
 
 
 namespace detail {
@@ -34,30 +36,18 @@ constexpr void check_fmt_params() {
 
 /*
  *
- * Type-specific formatting functions
- *      (Most of this code is shamelessly stolen from fmtlib)
- */
-
-
-// TODO
-
-
-/*
- *
  *  Formatting wrapper functions
  *
  */
 
 
 template <std::integral arg_t>
-constexpr void format_arg(char* dest, fmt_data_t fmt_data, arg_t) {
-    *(dest + fmt_data.position) = 'i';
-    //    dest = dest + fmt_data.position;
-    //    format_int(dest, fmt_data.length, arg);
+constexpr void format_arg(char* dest, fmt_data_t fmt_data, arg_t arg) {
+    detail::format_integral(dest, arg, fmt_data);
 };
+
 template <std::floating_point arg_t>
 constexpr void format_arg(char* dest, fmt_data_t fmt_data, arg_t) {
-    dest    = dest + fmt_data.position;
     *(dest) = 'f';
     *(dest + fmt_data.length - fmt_data.precision - 1) = '.';
 };
@@ -66,7 +56,7 @@ constexpr void format_arg(char* dest, fmt_data_t fmt_data, const char* arg) {
     const std::size_t len = const_strlen(arg);
     if (len > fmt_data.length) return;
 
-    dest = dest + fmt_data.position + fmt_data.length - len;
+    dest = dest + fmt_data.length - len;
 
     if (!std::is_constant_evaluated()) {
         std::memcpy(dest, arg, len);
@@ -84,7 +74,7 @@ constexpr void format_args(char*) {
 
 template <auto fmt_data_array, typename first_arg_t, typename... args_t>
 constexpr void format_args(char* dest, first_arg_t first_arg, args_t... args) {
-    format_arg(dest, fmt_data_array[0], first_arg);
+    format_arg(dest + fmt_data_array[0].position, fmt_data_array[0], first_arg);
     format_args<drop_first(fmt_data_array)>(dest, args...);
 }
 
@@ -117,7 +107,7 @@ consteval std::array<char, get_ast_output_len<ast>()> get_preproc_string() {
 
 
 template <detail::ConstString s, typename... args_t>
-constexpr std::array<char, detail::get_output_len<s>()> format(args_t... args) {
+constexpr auto format(args_t... args) {
     constexpr auto ast      = detail::parse_string<s>().value;
     constexpr auto fmt_data = detail::get_fmt_data<ast>();
 
@@ -127,6 +117,7 @@ constexpr std::array<char, detail::get_output_len<s>()> format(args_t... args) {
 
     return result;
 }
+
 
 template<detail::ConstString t_s>
 class fmt_literal_obj_t {

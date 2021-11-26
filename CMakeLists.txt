@@ -17,7 +17,7 @@ add_executable(logger src/main.cpp)
 if(MSVC)
     target_compile_options(logger PRIVATE /W4 /WX)
 else()
-    target_compile_options(logger PRIVATE -Wall -Wextra -pedantic)
+    target_compile_options(logger PRIVATE -O3 -Wall -Wextra -pedantic -fno-exceptions)
 endif()
 
 
