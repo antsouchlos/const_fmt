@@ -40,21 +40,16 @@ constexpr inline void check_fmt_params() {
  *
  */
 
-// TODO: Error handling
 template <fmt_data_t fmt_data, std::integral arg_t>
 constexpr inline void format_arg(char* dest, arg_t arg) {
-    constexpr auto error_array = get_init_array<fmt_data.length>('f');
-
     detail::format_int(dest, arg, fmt_data);
 };
-// TODO: Error handling
+
 template <fmt_data_t fmt_data, std::floating_point arg_t>
 constexpr inline void format_arg(char* dest, arg_t arg) {
-    *(dest) = 'f';
-    *(dest + fmt_data.length - fmt_data.precision - 1) = '.';
-
     //detail::format_float(dest, arg, fmt_data);
 };
+
 // TODO: Error handling
 template<fmt_data_t fmt_data>
 constexpr inline void format_arg(char* dest, const char* arg) {
@@ -87,7 +82,7 @@ constexpr inline void format_args(char* dest, first_arg_t first_arg, args_t... a
 
 template <auto ast>
 consteval inline std::array<char, get_ast_output_len<ast>()> get_preproc_string() {
-    auto result = get_init_array<get_ast_output_len<ast>()>('0');
+    auto result = get_init_array<get_ast_output_len<ast>()>('f');
 
     int i = 0;
 
