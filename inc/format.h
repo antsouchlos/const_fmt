@@ -102,7 +102,7 @@ consteval inline std::array<char, get_ast_output_len<ast>()> get_preproc_string(
 
 /*
  *
- * Public API
+ * Public Interface
  *
  */
 
