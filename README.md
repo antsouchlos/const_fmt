@@ -15,3 +15,25 @@ This is returned as a `std::array<char, N>`, where `N` is automatically evaluate
 time then formats the numbers and writes them into their place in the array.
 
 Disclaimer: The actual formatting code is largely shamelessly stolen from `fmtlib`.
+
+## Building and running the tests
+
+1. Initialize the `googletest` framework submodule
+```bash
+$ git submodule update --init
+```
+
+2. Create the build directory
+```bash
+$ cmake -B build -S .
+```
+
+3. Build the project
+```bash
+$ cmake --build build/
+```
+
+4. Run the tests
+```bash
+$ ctest --test-dir build/
+```
