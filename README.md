@@ -16,6 +16,14 @@ time then formats the numbers and writes them into their place in the array.
 
 Disclaimer: The actual formatting code is largely shamelessly stolen from `fmtlib`.
 
+## Including in a project
+
+In order to keep it as lightweight and optimizable as possible, `const_fmt` is implemented as a header-only
+library.
+
+This means that including in a project is as simple as cloning this project (or e.g. adding it as a submodule)
+and adding the repository root folder to the compile include directories.
+
 ## Building and running the tests
 
 1. Initialize the `googletest` framework submodule
