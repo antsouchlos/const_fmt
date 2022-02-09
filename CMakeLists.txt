@@ -9,7 +9,7 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 
-include_directories(inc)
+include_directories(.)
 
 add_executable(logger src/main.cpp)
 
