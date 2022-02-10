@@ -7,7 +7,7 @@ Meant for systems with very few resources, such as embedded systems.
 
 ## Overview
 
-During compile-time, the string to be formatted is preprocessed to the point, only the actual values to be formatted
+During compile-time, the string to be formatted is preprocessed to the point only the actual values to be formatted
 have to be written (If they are not available at compile time).
 
 For example `One number: {:03}; And another one: {:05.3}` is preprocessed into `One number: 000; And another one: 00.000`.
@@ -21,8 +21,8 @@ Disclaimer: The actual formatting code is largely shamelessly stolen from `fmtli
 In order to keep it as lightweight and optimizable as possible, `const_fmt` is implemented as a header-only
 library.
 
-This means that including in a project is as simple as cloning this project (or e.g. adding it as a submodule)
-and adding the repository root folder to the compile include directories.
+This means that using it in a project is as simple as cloning this repo (or e.g. adding it as a submodule)
+and adding the repository root folder to the compiler include directories.
 
 ## Building and running the tests
 
