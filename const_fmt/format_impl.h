@@ -89,7 +89,12 @@ constexpr inline void copy2(char* dst, const char* src) {
 template <typename uint_t>
 constexpr inline void format_decimal(char* out, uint_t value, int n_digits,
                                      int size) {
-    if (n_digits > size) return;
+    if (n_digits > size) {
+        for (int i = 0; i < size; ++i) {
+            *(out++) = 'f';
+        }
+        return;
+    }
 
     out += size;
     while (value >= 100) {
@@ -149,7 +154,7 @@ constexpr inline void format_int(char* out, int_t value) {
 template <std::floating_point float_t, fmt_data_t t_fmt_node>
 constexpr inline void format_float(char* out, float_t value) {
 
-    *(out)                                            = 'f';
+    *(out)                                                = 'f';
     *(out + t_fmt_node.length - t_fmt_node.precision - 1) = '.';
 }
 
