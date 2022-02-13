@@ -82,17 +82,19 @@ constexpr inline void format_args(char* dest, first_arg_t first_arg,
 
 
 template <auto ast>
-consteval inline std::array<char, get_ast_output_len<ast>()>
-get_preproc_string() {
-    auto result = get_init_array<get_ast_output_len<ast>()>('f');
+consteval inline auto get_preproc_string() {
+    std::array<char, get_ast_output_len<ast>()> result;
 
     int i = 0;
 
     for (const auto& ast_node : ast) {
-        if (ast_node.is_char())
+        if (ast_node.is_char()) {
             result[i++] = ast_node.get_char();
-        else
-            i += ast_node.get_node().length;
+        } else {
+            for (int j = 0; j < ast_node.get_node().length; ++j)
+                result[i++] = ast_node.get_node().has_zero_padding ? '0' : ' ';
+                //i += ast_node.get_node().length;
+        }
     }
 
     return result;

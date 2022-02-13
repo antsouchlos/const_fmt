@@ -18,17 +18,6 @@ constexpr inline std::size_t const_pow(std::size_t base, std::size_t pow) {
 }
 
 
-template <std::size_t t_n>
-consteval inline std::array<char, t_n> get_init_array(char val) {
-    std::array<char, t_n> result;
-
-    for (auto& c : result)
-        c = val;
-
-    return result;
-}
-
-
 template <auto ast>
 consteval inline std::size_t count_ast_format_nodes() {
     std::size_t result = 0;
