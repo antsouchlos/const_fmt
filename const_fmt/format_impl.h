@@ -112,6 +112,25 @@ constexpr inline void format_decimal(char* out, uint_t value, int n_digits,
     copy2(out, digits2(static_cast<size_t>(value)));
 }
 
+// returns {abs_value, was_negative}
+template <std::signed_integral int_t>
+constexpr std::pair<typename std::make_unsigned<int_t>::type, bool>
+get_abs_value(int_t value) {
+    using uint_t = typename std::make_unsigned<int_t>::type;
+
+    uint_t abs_value = static_cast<uint_t>(value);
+
+    const bool negative = value < 0;
+    if (negative) abs_value = 0 - abs_value;
+
+    return {abs_value, negative};
+}
+
+template <std::unsigned_integral int_t>
+constexpr std::pair<int_t, bool> get_abs_value(int_t value) {
+    return {value, false};
+}
+
 
 /*
  *
@@ -127,9 +146,7 @@ constexpr inline void format_int(char* out, uint_t value) {
 
 template <std::signed_integral int_t, fmt_data_t t_fmt_node>
 constexpr inline void format_int(char* out, int_t value) {
-    uint64_t   abs_value = static_cast<uint64_t>(value);
-    const bool negative  = value < 0;
-    if (negative) abs_value = 0 - abs_value;
+    const auto [abs_value, negative] = get_abs_value(value);
 
     const int n_digits = count_digits(abs_value);
 
@@ -153,9 +170,34 @@ constexpr inline void format_int(char* out, int_t value) {
 
 template <std::floating_point float_t, fmt_data_t t_fmt_node>
 constexpr inline void format_float(char* out, float_t value) {
+    // clang-format off
+    constexpr fmt_data_t fmt_node_integral = {
+        t_fmt_node.has_zero_padding,                  // has_zero_padding
+        t_fmt_node.length - t_fmt_node.precision - 1, // length
+        t_fmt_node.precision,                         // ignored
+        t_fmt_node.type,                              // ignored
+        t_fmt_node.position                           // ignored
+    };
+    constexpr fmt_data_t fmt_node_fractional = {
+        true,                                         // has_zero_padding
+        t_fmt_node.precision,                         // length
+        t_fmt_node.precision,                         // ignored
+        t_fmt_node.type,                              // ignored
+        t_fmt_node.position                           // ignored
+    };
+    // clang-format on
 
-    *(out)                                                = 'f';
     *(out + t_fmt_node.length - t_fmt_node.precision - 1) = '.';
+
+    const int integral = static_cast<int>(value);
+
+    constexpr std::size_t factor = const_pow(10, t_fmt_node.precision);
+    const int fractional = static_cast<int>((value - integral) * factor);
+
+    const auto [fractional_abs, fractional_negative] = get_abs_value(fractional);
+
+    format_int<int, fmt_node_integral>(out, integral);
+    format_int<uint16_t, fmt_node_fractional>(out + t_fmt_node.length - t_fmt_node.precision, fractional_abs);
 }
 
 

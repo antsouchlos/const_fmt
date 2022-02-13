@@ -47,7 +47,7 @@ constexpr inline void format_arg(char* dest, arg_t arg) {
 
 template <fmt_data_t fmt_data, std::floating_point arg_t>
 constexpr inline void format_arg(char* dest, arg_t arg){
-//    const_fmt_detail::format_float<arg_t, fmt_data>(dest, arg);
+    const_fmt_detail::format_float<arg_t, fmt_data>(dest, arg);
 };
 
 // TODO: Error handling
