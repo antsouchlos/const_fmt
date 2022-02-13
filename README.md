@@ -49,7 +49,7 @@ $ ctest --test-dir build/
 ## Limitations
 
 Only a relatively limited subset of the `fmtlib` syntax is recognized (for now anyway). In particular,
-there is no support for positional arguments, alignment, chrono format specs and custom format specifications.
+there is no support for positional arguments, alignment, chrono format specs and custom const_format specifications.
 
-By nature of the library design, which forces compile-time preprocessing of the format string, no dynamic width or
+By nature of the library design, which forces compile-time preprocessing of the const_format string, no dynamic width or
 dynamic precision can be implemented.

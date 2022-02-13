@@ -5,7 +5,7 @@
 using namespace const_fmt;
 
 int main() {
-    constexpr auto s = "abcdef {:04}"_fmt(123);
+    constexpr auto s = "abcdef {:04}"_const_fmt(123);
 
     // Convert the s (with a type of 'std::array<char, N>') into something
     // writable to std::cout

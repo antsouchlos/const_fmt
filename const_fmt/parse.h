@@ -5,7 +5,7 @@
 #include "types.h"
 
 
-// clang-format off
+// clang-const_format off
 
 /*
  *
@@ -34,7 +34,7 @@
  *
  */
 
-// clang-format on
+// clang-const_format on
 
 
 namespace const_fmt { namespace const_fmt_detail {

@@ -9,18 +9,18 @@ using namespace const_fmt::const_fmt_detail;
 TEST(Format, positive_int) {
     constexpr std::array<char, 8> control1   = {'0', '0', '0', '0',
                                                 '0', '0', '0', '2'};
-    constexpr std::array<char, 8> formatted1 = format<"{:08}">(2);
+    constexpr std::array<char, 8> formatted1 = const_format<"{:08}">(2);
 
     constexpr std::array<char, 8> control2   = {' ', ' ', ' ', '2',
                                                 '2', '2', '2', '2'};
-    constexpr std::array<char, 8> formatted2 = format<"{:8}">(22222);
+    constexpr std::array<char, 8> formatted2 = const_format<"{:8}">(22222);
 
     constexpr std::array<char, 8> control3   = {'0', '0', '0', '1',
                                                 '2', '3', '4', '5'};
-    constexpr std::array<char, 8> formatted3 = format<"{:08.4}">(12345);
+    constexpr std::array<char, 8> formatted3 = const_format<"{:08.4}">(12345);
 
     constexpr std::array<char, 4> control4   = {'6', '7', '8', '9'};
-    constexpr std::array<char, 4> formatted4 = format<"{:4}">(6789);
+    constexpr std::array<char, 4> formatted4 = const_format<"{:4}">(6789);
 
     EXPECT_EQ(control1, formatted1);
     EXPECT_EQ(control2, formatted2);
@@ -31,18 +31,18 @@ TEST(Format, positive_int) {
 TEST(Format, negative_int) {
     constexpr std::array<char, 8> control1   = {'-', '0', '0', '0',
                                                 '0', '0', '0', '2'};
-    constexpr std::array<char, 8> formatted1 = format<"{:08}">(-2);
+    constexpr std::array<char, 8> formatted1 = const_format<"{:08}">(-2);
 
     constexpr std::array<char, 8> control2   = {' ', ' ', '-', '2',
                                                 '2', '2', '2', '2'};
-    constexpr std::array<char, 8> formatted2 = format<"{:8}">(-22222);
+    constexpr std::array<char, 8> formatted2 = const_format<"{:8}">(-22222);
 
     constexpr std::array<char, 8> control3   = {'-', '0', '0', '1',
                                                 '2', '3', '4', '5'};
-    constexpr std::array<char, 8> formatted3 = format<"{:08.4}">(-12345);
+    constexpr std::array<char, 8> formatted3 = const_format<"{:08.4}">(-12345);
 
     constexpr std::array<char, 5> control4   = {'-', '6', '7', '8', '9'};
-    constexpr std::array<char, 5> formatted4 = format<"{:5}">(-6789);
+    constexpr std::array<char, 5> formatted4 = const_format<"{:5}">(-6789);
 
     EXPECT_EQ(control1, formatted1);
     EXPECT_EQ(control2, formatted2);

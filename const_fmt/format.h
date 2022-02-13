@@ -22,7 +22,7 @@ namespace const_fmt { namespace const_fmt_detail {
 template <ConstString s>
 constexpr inline int get_output_len() {
     constexpr auto parse_result = parse_string<s>();
-    static_assert(parse_result.is_valid, "Syntax error in format string");
+    static_assert(parse_result.is_valid, "Syntax error in const_format string");
 
     return get_ast_output_len<parse_result.value>();
 }
@@ -113,7 +113,7 @@ namespace const_fmt {
 
 
 template <const_fmt_detail::ConstString s, typename... args_t>
-constexpr inline auto format(args_t... args) {
+constexpr inline auto const_format(args_t... args) {
     constexpr auto ast      = const_fmt_detail::parse_string<s>().value;
     constexpr auto fmt_data = const_fmt_detail::get_fmt_data<ast>();
 
@@ -126,17 +126,17 @@ constexpr inline auto format(args_t... args) {
 
 
 template <const_fmt_detail::ConstString t_s>
-class fmt_literal_obj_t {
+class const_fmt_literal_obj_t {
 public:
     template <typename... args_t>
     constexpr auto operator()(args_t... args) {
-        return format<t_s>(args...);
+        return const_format<t_s>(args...);
     }
 };
 
 template <const_fmt_detail::ConstString t_s>
-constexpr auto operator""_fmt() {
-    return fmt_literal_obj_t<t_s>{};
+constexpr auto operator""_const_fmt() {
+    return const_fmt_literal_obj_t<t_s>{};
 }
 
 
