@@ -1,21 +1,3 @@
-cmake_minimum_required(VERSION 3.21)
-project(logger)
-
-
-set(CMAKE_CXX_STANDARD 20)
-
-if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Release)
-endif()
-
-
-include_directories(..)
-
-
-enable_testing()
-include(GoogleTest)
-
-
 add_subdirectory("googletest")
 
 mark_as_advanced(
