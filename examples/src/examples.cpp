@@ -5,7 +5,7 @@
 using namespace const_fmt;
 
 int main() {
-    constexpr auto s = "abcdef {:09.2}"_const_fmt(-876.3);
+    constexpr auto s = "This is an integer: {:08}, and this is a float: {:09.4}"_const_fmt(12345, -86.2);
 
     // Convert s (with a type of 'std::array<char, N>') into something
     // writable to std::cout
