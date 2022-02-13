@@ -5,7 +5,7 @@
 #include <array>
 
 
-namespace detail {
+namespace const_fmt { namespace const_fmt_detail {
 
 
 /*
@@ -136,7 +136,7 @@ struct fmt_data_t {
 };
 
 
-} // namespace detail
+}} // namespace const_fmt::const_fmt_detail
 
 
 #endif // LOGGER_TYPES_H

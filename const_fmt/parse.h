@@ -37,7 +37,7 @@
 // clang-format on
 
 
-namespace detail {
+namespace const_fmt { namespace const_fmt_detail {
 
 
 /*
@@ -119,42 +119,42 @@ constexpr inline parse_result_t<unsigned> parse_number(unsigned i) {
 template <ConstString s>
 constexpr inline parse_result_t<FormatType> parse_type(unsigned i) {
     switch (s[i]) {
-        case 's':
-            return {true, ++i, FormatType::s};
-        case 'c':
-            return {true, ++i, FormatType::c};
-        case 'b':
-            return {true, ++i, FormatType::b};
-        case 'B':
-            return {true, ++i, FormatType::B};
-        case 'd':
-            return {true, ++i, FormatType::d};
-        case 'o':
-            return {true, ++i, FormatType::o};
-        case 'x':
-            return {true, ++i, FormatType::x};
-        case 'X':
-            return {true, ++i, FormatType::X};
-        case 'a':
-            return {true, ++i, FormatType::a};
-        case 'A':
-            return {true, ++i, FormatType::A};
-        case 'e':
-            return {true, ++i, FormatType::e};
-        case 'E':
-            return {true, ++i, FormatType::E};
-        case 'f':
-            return {true, ++i, FormatType::f};
-        case 'F':
-            return {true, ++i, FormatType::F};
-        case 'g':
-            return {true, ++i, FormatType::g};
-        case 'G':
-            return {true, ++i, FormatType::G};
-        case 'p':
-            return {true, ++i, FormatType::p};
-        default:
-            return {false, i, FormatType::s};
+    case 's':
+        return {true, ++i, FormatType::s};
+    case 'c':
+        return {true, ++i, FormatType::c};
+    case 'b':
+        return {true, ++i, FormatType::b};
+    case 'B':
+        return {true, ++i, FormatType::B};
+    case 'd':
+        return {true, ++i, FormatType::d};
+    case 'o':
+        return {true, ++i, FormatType::o};
+    case 'x':
+        return {true, ++i, FormatType::x};
+    case 'X':
+        return {true, ++i, FormatType::X};
+    case 'a':
+        return {true, ++i, FormatType::a};
+    case 'A':
+        return {true, ++i, FormatType::A};
+    case 'e':
+        return {true, ++i, FormatType::e};
+    case 'E':
+        return {true, ++i, FormatType::E};
+    case 'f':
+        return {true, ++i, FormatType::f};
+    case 'F':
+        return {true, ++i, FormatType::F};
+    case 'g':
+        return {true, ++i, FormatType::g};
+    case 'G':
+        return {true, ++i, FormatType::G};
+    case 'p':
+        return {true, ++i, FormatType::p};
+    default:
+        return {false, i, FormatType::s};
     }
 }
 
@@ -214,7 +214,8 @@ constexpr inline parse_result_t<fmt_node_t> parse_braces(unsigned i) {
 }
 
 template <ConstString s>
-constexpr inline parse_result_t<string_result_t<get_ast_len<s>()>> parse_string() {
+constexpr inline parse_result_t<string_result_t<get_ast_len<s>()>>
+parse_string() {
     parse_result_t<string_result_t<get_ast_len<s>()>> result;
     result.is_valid = true;
 
@@ -242,7 +243,7 @@ constexpr inline parse_result_t<string_result_t<get_ast_len<s>()>> parse_string(
 }
 
 
-} // namespace detail
+}} // namespace const_fmt::const_fmt_detail
 
 
 

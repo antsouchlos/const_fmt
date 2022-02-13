@@ -4,12 +4,12 @@
 
 #include <cstring>
 
+#include "format_impl.h"
 #include "parse.h"
 #include "utility.h"
-#include "format_impl.h"
 
 
-namespace detail {
+namespace const_fmt { namespace const_fmt_detail {
 
 
 /*
@@ -42,16 +42,16 @@ constexpr inline void check_fmt_params() {
 
 template <fmt_data_t fmt_data, std::integral arg_t>
 constexpr inline void format_arg(char* dest, arg_t arg) {
-    detail::format_int(dest, arg, fmt_data);
+    const_fmt_detail::format_int(dest, arg, fmt_data);
 };
 
 template <fmt_data_t fmt_data, std::floating_point arg_t>
-constexpr inline void format_arg(char* dest, arg_t arg) {
-    //detail::format_float(dest, arg, fmt_data);
+constexpr inline void format_arg(char* dest, arg_t arg){
+    // const_fmt_detail::format_float(dest, arg, fmt_data);
 };
 
 // TODO: Error handling
-template<fmt_data_t fmt_data>
+template <fmt_data_t fmt_data>
 constexpr inline void format_arg(char* dest, const char* arg) {
     const std::size_t len = const_strlen(arg);
     if (len > fmt_data.length) return;
@@ -74,14 +74,16 @@ constexpr inline void format_args(char*) {
 }
 
 template <auto fmt_data_array, typename first_arg_t, typename... args_t>
-constexpr inline void format_args(char* dest, first_arg_t first_arg, args_t... args) {
+constexpr inline void format_args(char* dest, first_arg_t first_arg,
+                                  args_t... args) {
     format_arg<fmt_data_array[0]>(dest + fmt_data_array[0].position, first_arg);
     format_args<drop_first(fmt_data_array)>(dest, args...);
 }
 
 
 template <auto ast>
-consteval inline std::array<char, get_ast_output_len<ast>()> get_preproc_string() {
+consteval inline std::array<char, get_ast_output_len<ast>()>
+get_preproc_string() {
     auto result = get_init_array<get_ast_output_len<ast>()>('f');
 
     int i = 0;
@@ -97,7 +99,7 @@ consteval inline std::array<char, get_ast_output_len<ast>()> get_preproc_string(
 }
 
 
-} // namespace detail
+}} // namespace const_fmt::const_fmt_detail
 
 
 /*
@@ -107,32 +109,38 @@ consteval inline std::array<char, get_ast_output_len<ast>()> get_preproc_string(
  */
 
 
-template <detail::ConstString s, typename... args_t>
+namespace const_fmt {
+
+
+template <const_fmt_detail::ConstString s, typename... args_t>
 constexpr inline auto format(args_t... args) {
-    constexpr auto ast      = detail::parse_string<s>().value;
-    constexpr auto fmt_data = detail::get_fmt_data<ast>();
+    constexpr auto ast      = const_fmt_detail::parse_string<s>().value;
+    constexpr auto fmt_data = const_fmt_detail::get_fmt_data<ast>();
 
-    auto result = detail::get_preproc_string<ast>();
+    auto result = const_fmt_detail::get_preproc_string<ast>();
 
-    detail::format_args<fmt_data>(result.begin(), args...);
+    const_fmt_detail::format_args<fmt_data>(result.begin(), args...);
 
     return result;
 }
 
 
-template<detail::ConstString t_s>
+template <const_fmt_detail::ConstString t_s>
 class fmt_literal_obj_t {
-    public:
-        template<typename... args_t>
-        constexpr auto operator()(args_t... args) {
-            return format<t_s>(args...);
-        }
+public:
+    template <typename... args_t>
+    constexpr auto operator()(args_t... args) {
+        return format<t_s>(args...);
+    }
 };
 
-template <detail::ConstString t_s>
+template <const_fmt_detail::ConstString t_s>
 constexpr auto operator""_fmt() {
     return fmt_literal_obj_t<t_s>{};
 }
+
+
+} // namespace const_fmt
 
 
 #endif // LOGGER_FORMAT_H

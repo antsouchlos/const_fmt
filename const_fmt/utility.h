@@ -7,7 +7,7 @@
 #include "types.h"
 
 
-namespace detail {
+namespace const_fmt { namespace const_fmt_detail {
 
 
 constexpr inline std::size_t const_pow(std::size_t base, std::size_t pow) {
@@ -41,7 +41,8 @@ consteval inline std::size_t count_ast_format_nodes() {
 
 
 template <auto ast>
-consteval inline std::array<fmt_data_t, count_ast_format_nodes<ast>()> get_fmt_data() {
+consteval inline std::array<fmt_data_t, count_ast_format_nodes<ast>()>
+get_fmt_data() {
     std::array<fmt_data_t, count_ast_format_nodes<ast>()> result = {};
 
     std::size_t position = 0;
@@ -96,7 +97,7 @@ consteval inline int get_ast_output_len() {
     return result;
 }
 
-constexpr inline  std::size_t const_strlen(const char* arg) {
+constexpr inline std::size_t const_strlen(const char* arg) {
     if (std::is_constant_evaluated()) {
         return *arg ? 1 + const_strlen(arg + 1) : 0;
     } else {
@@ -105,7 +106,7 @@ constexpr inline  std::size_t const_strlen(const char* arg) {
 }
 
 
-} // namespace detail
+}} // namespace const_fmt::const_fmt_detail
 
 
 #endif // LOGGER_UTILITY_H

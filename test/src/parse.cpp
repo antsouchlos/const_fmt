@@ -2,7 +2,7 @@
 #include <const_fmt/parse.h>
 
 
-using namespace detail;
+using namespace const_fmt::const_fmt_detail;
 
 
 TEST(Parse, parse_number) {

@@ -2,7 +2,8 @@
 #include <gtest/gtest.h>
 
 
-using namespace detail;
+using namespace const_fmt;
+using namespace const_fmt::const_fmt_detail;
 
 
 TEST(Format, positive_int) {

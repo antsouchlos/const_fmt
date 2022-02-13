@@ -16,7 +16,7 @@
 #include "utility.h"
 
 
-namespace detail {
+namespace const_fmt { namespace const_fmt_detail {
 
 
 /*
@@ -148,7 +148,7 @@ constexpr inline void format_float(char* out, float_t value,
 }
 
 
-} // namespace detail
+}} // namespace const_fmt::const_fmt_detail
 
 
 #endif // LOGGER_FORMAT_IMPL_H
