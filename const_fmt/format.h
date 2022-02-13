@@ -42,12 +42,12 @@ constexpr inline void check_fmt_params() {
 
 template <fmt_data_t fmt_data, std::integral arg_t>
 constexpr inline void format_arg(char* dest, arg_t arg) {
-    const_fmt_detail::format_int(dest, arg, fmt_data);
+    const_fmt_detail::format_int<arg_t, fmt_data>(dest, arg);
 };
 
 template <fmt_data_t fmt_data, std::floating_point arg_t>
 constexpr inline void format_arg(char* dest, arg_t arg){
-    // const_fmt_detail::format_float(dest, arg, fmt_data);
+//    const_fmt_detail::format_float<arg_t, fmt_data>(dest, arg);
 };
 
 // TODO: Error handling
@@ -93,7 +93,6 @@ consteval inline auto get_preproc_string() {
         } else {
             for (int j = 0; j < ast_node.get_node().length; ++j)
                 result[i++] = ast_node.get_node().has_zero_padding ? '0' : ' ';
-                //i += ast_node.get_node().length;
         }
     }
 

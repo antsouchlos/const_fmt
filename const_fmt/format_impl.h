@@ -87,8 +87,9 @@ constexpr inline void copy2(char* dst, const char* src) {
 }
 
 template <typename uint_t>
-constexpr inline void format_decimal(char* out, uint_t value, int size) {
-    if (count_digits(value) > size) return;
+constexpr inline void format_decimal(char* out, uint_t value, int n_digits,
+                                     int size) {
+    if (n_digits > size) return;
 
     out += size;
     while (value >= 100) {
@@ -114,21 +115,27 @@ constexpr inline void format_decimal(char* out, uint_t value, int size) {
  */
 
 
-template <std::unsigned_integral uint_t>
-constexpr inline void format_int(char* out, uint_t value, fmt_data_t fmt_node) {
-    format_decimal(out, value, fmt_node.length);
+template <std::unsigned_integral uint_t, fmt_data_t t_fmt_node>
+constexpr inline void format_int(char* out, uint_t value) {
+    format_decimal(out, value, count_digits(value), t_fmt_node.length);
 }
 
-template <std::signed_integral uint_t>
-constexpr inline void format_int(char* out, uint_t value, fmt_data_t fmt_node) {
-    auto       abs_value = static_cast<uint64_t>(value);
+template <std::signed_integral int_t, fmt_data_t t_fmt_node>
+constexpr inline void format_int(char* out, int_t value) {
+    uint64_t   abs_value = static_cast<uint64_t>(value);
     const bool negative  = value < 0;
-
     if (negative) abs_value = 0 - abs_value;
-    format_decimal(out + 1 * (negative), abs_value,
-                   fmt_node.length - 1 * (negative));
 
-    if (negative) *out = '-';
+    const int n_digits = count_digits(abs_value);
+
+    format_decimal(out + 1 * (negative), abs_value, n_digits,
+                   t_fmt_node.length - 1 * (negative));
+
+    if constexpr (t_fmt_node.has_zero_padding) {
+        if (negative) *(out) = '-';
+    } else {
+        if (negative) *(out + t_fmt_node.length - n_digits - 1) = '-';
+    }
 }
 
 
@@ -139,12 +146,11 @@ constexpr inline void format_int(char* out, uint_t value, fmt_data_t fmt_node) {
  */
 
 
-template <std::floating_point float_t>
-constexpr inline void format_float(char* out, float_t value,
-                                   fmt_data_t fmt_data) {
+template <std::floating_point float_t, fmt_data_t t_fmt_node>
+constexpr inline void format_float(char* out, float_t value) {
 
     *(out)                                            = 'f';
-    *(out + fmt_data.length - fmt_data.precision - 1) = '.';
+    *(out + t_fmt_node.length - t_fmt_node.precision - 1) = '.';
 }
 
 
