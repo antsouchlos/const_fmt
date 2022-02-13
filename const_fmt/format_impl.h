@@ -148,7 +148,7 @@ template <std::signed_integral int_t, fmt_data_t t_fmt_node>
 constexpr inline void format_int(char* out, int_t value) {
     const auto [abs_value, negative] = get_abs_value(value);
 
-    const int n_digits = count_digits(abs_value);
+    const std::size_t n_digits = count_digits(abs_value);
 
     format_decimal(out + 1 * (negative), abs_value, n_digits,
                    t_fmt_node.length - 1 * (negative));
@@ -156,7 +156,8 @@ constexpr inline void format_int(char* out, int_t value) {
     if constexpr (t_fmt_node.has_zero_padding) {
         if (negative) *(out) = '-';
     } else {
-        if (negative) *(out + t_fmt_node.length - n_digits - 1) = '-';
+        if (n_digits < t_fmt_node.length)
+            if (negative) *(out + t_fmt_node.length - n_digits - 1) = '-';
     }
 }
 
@@ -194,10 +195,12 @@ constexpr inline void format_float(char* out, float_t value) {
     constexpr std::size_t factor = const_pow(10, t_fmt_node.precision);
     const int fractional = static_cast<int>((value - integral) * factor);
 
-    const auto [fractional_abs, fractional_negative] = get_abs_value(fractional);
+    const auto [fractional_abs, fractional_negative] =
+        get_abs_value(fractional);
 
     format_int<int, fmt_node_integral>(out, integral);
-    format_int<uint16_t, fmt_node_fractional>(out + t_fmt_node.length - t_fmt_node.precision, fractional_abs);
+    format_int<uint16_t, fmt_node_fractional>(
+        out + t_fmt_node.length - t_fmt_node.precision, fractional_abs);
 }
 
 
