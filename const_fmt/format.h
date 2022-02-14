@@ -115,10 +115,12 @@ namespace const_fmt {
 
 template <const_fmt_detail::ConstString s, typename... args_t>
 constexpr inline auto const_format(args_t... args) {
-    constexpr auto ast      = const_fmt_detail::parse_string<s>().value;
-    constexpr auto fmt_data = const_fmt_detail::get_fmt_data<ast>();
+    constexpr auto ast      = const_fmt_detail::parse_string<s>();
+    constexpr auto fmt_data = const_fmt_detail::get_fmt_data<ast.value>();
 
-    auto result = const_fmt_detail::get_preproc_string<ast>();
+    static_assert(ast.is_valid, "Invalid format string");
+
+    auto result = const_fmt_detail::get_preproc_string<ast.value>();
 
     const_fmt_detail::format_args<fmt_data>(result.begin(), args...);
 
