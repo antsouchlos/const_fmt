@@ -11,8 +11,7 @@ During compile-time, the string to be formatted is preprocessed to the point onl
 have to be written (If they are not available at compile time).
 
 For example `One number: {:03}; And another one: {:05.3}` is preprocessed into `One number: 000; And another one: 00.000`.
-This is returned as a `std::array<char, N>`, where `N` is automatically evaluated. The only code executed at compile
-time then formats the numbers and writes them into their place in the array.
+This is returned as a `std::array<char, N>`, where `N` is automatically evaluated. The only code executed at runtime then formats the numbers and writes them into their places in the array.
 
 Disclaimer: The actual formatting code is largely shamelessly stolen from `fmtlib`.
 
@@ -48,8 +47,11 @@ $ ctest --test-dir build/
 
 ## Limitations
 
+For the compile time preprocessing of format strings non non-type template parameters are heavily relied upon,
+which means C++20 is required.
+
 Only a relatively limited subset of the `fmtlib` syntax is recognized (for now anyway). In particular,
-there is no support for positional arguments, alignment, chrono format specs and custom const_format specifications.
+float formatting in decimal and integer formatting in decimal, binary and hexadecimal are supported.
 
 By nature of the library design, which forces compile-time preprocessing of the const_format string, no dynamic width or
 dynamic precision can be implemented.
