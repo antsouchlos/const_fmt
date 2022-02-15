@@ -10,8 +10,7 @@
  *
  */
 
-
-#include <cstdint>
+#include <stdint.h>
 
 #include "utility.h"
 
