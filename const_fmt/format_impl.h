@@ -70,11 +70,21 @@ constexpr inline auto count_digits_base(uint64_t n) -> int {
 
         return result;
     } else {
-        if (!std::is_constant_evaluated()) {
-            return do_count_digits_decimal(n);
-        }
+        if constexpr (t_format_type == FormatType::x) {
+            int result = 0;
 
-        return count_digits_decimal_fallback(n);
+            while (n) {
+                n = n >> 4;
+                result += 1;
+            }
+
+            return (result + count_digits_base<FormatType::b>(n));
+        } else {
+            if (!std::is_constant_evaluated()) {
+                return do_count_digits_decimal(n);
+            }
+            return count_digits_decimal_fallback(n);
+        }
     }
 }
 
@@ -86,11 +96,24 @@ constexpr inline const char* digits2_base(size_t value) {
     if constexpr (t_format_type == FormatType::b) {
         return &"00011011"[value * 2];
     } else {
-        return &"0001020304050607080910111213141516171819"
-                "2021222324252627282930313233343536373839"
-                "4041424344454647484950515253545556575859"
-                "6061626364656667686970717273747576777879"
-                "8081828384858687888990919293949596979899"[value * 2];
+        if constexpr (t_format_type == FormatType::x) {
+            // clang-format off
+            return &"000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F"
+                    "202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F"
+                    "404142434445464748494A4B4C4D4E4F505152535455565758595A5B5C5D5E5F"
+                    "606162636465666768696A6B6C6D6E6F707172737475767778796A6B6C6D6E6F"
+                    "808182838485868788898A8B8C8D8E8F909192939495969798999A9B9C9D9E9F"
+                    "A0A1A2A3A4A5A6A7A8A9AAABACADAEAFB0B1B2B3B4B5B6B7B8B9BABBBCBDBEBF"
+                    "C0C1C2C3C4C5C6C7C8C9CACBCCCDCECFD0D1D2D3D4D5D6D7D8D9DADBDCDDDEDF"
+                    "E0E1E2E3E4E5E6E7E8E9EAEBECEDEEEFF0F1F2F3F4F5F6F7F8F9FAFBFCFDFEFF"[value * 2];
+            // clang-format on
+        } else {
+            return &"0001020304050607080910111213141516171819"
+                    "2021222324252627282930313233343536373839"
+                    "4041424344454647484950515253545556575859"
+                    "6061626364656667686970717273747576777879"
+                    "8081828384858687888990919293949596979899"[value * 2];
+        }
     }
 }
 
@@ -104,11 +127,22 @@ constexpr inline void copy2(char* dst, const char* src) {
     *dst   = static_cast<char>(*src);
 }
 
+template <FormatType t_format_type>
+consteval inline unsigned get_base_divisor() {
+    switch (t_format_type) {
+    case FormatType::b:
+        return 2;
+    case FormatType::x:
+        return 16;
+    default:
+        return 10;
+    }
+}
 
 template <FormatType t_format_type, typename uint_t>
 constexpr inline void format_base(char* out, uint_t value, int n_digits,
                                   int size) {
-    constexpr unsigned divisor = (t_format_type == FormatType::b) ? 2 : 10;
+    constexpr unsigned divisor        = get_base_divisor<t_format_type>();
     constexpr unsigned square_divisor = const_pow(divisor, 2);
 
     if (n_digits > size) {
@@ -165,7 +199,6 @@ constexpr std::pair<int_t, bool> get_abs_value(int_t value) {
 
 template <fmt_data_t t_fmt_node, std::unsigned_integral uint_t>
 constexpr inline void format_int(char* out, uint_t value) {
-    // format_decimal(out, value, count_digits(value), t_fmt_node.length);
     format_base<t_fmt_node.type>(out, value,
                                  count_digits_base<t_fmt_node.type>(value),
                                  t_fmt_node.length);
