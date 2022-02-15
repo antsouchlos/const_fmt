@@ -95,6 +95,10 @@ constexpr inline const char* digits2_base(size_t value) {
 
 
 constexpr inline void copy2(char* dst, const char* src) {
+    if (!std::is_constant_evaluated()) {
+        std::memcpy(dst, src, 2);
+        return;
+    }
     *dst++ = static_cast<char>(*src++);
     *dst   = static_cast<char>(*src);
 }
