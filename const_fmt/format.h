@@ -2,8 +2,6 @@
 #define LOGGER_FORMAT_H
 
 
-#include <cstring>
-
 #include "format_impl.h"
 #include "parse.h"
 #include "utility.h"
