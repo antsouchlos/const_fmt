@@ -6,7 +6,7 @@ using namespace const_fmt;
 using namespace const_fmt::const_fmt_detail;
 
 
-TEST(Format, positive_int) {
+TEST(FormatDecimal, positive_int) {
     constexpr std::array<char, 8> control1   = {'0', '0', '0', '0',
                                               '0', '0', '0', '2'};
     constexpr std::array<char, 8> formatted1 = const_format<"{:08}">(2);
@@ -32,7 +32,7 @@ TEST(Format, positive_int) {
     EXPECT_EQ(control5, formatted5);
 }
 
-TEST(Format, negative_int) {
+TEST(FormatDecimal, negative_int) {
     constexpr std::array<char, 8> control1   = {'-', '0', '0', '0',
                                               '0', '0', '0', '2'};
     constexpr std::array<char, 8> formatted1 = const_format<"{:08}">(-2);
@@ -58,7 +58,7 @@ TEST(Format, negative_int) {
     EXPECT_EQ(control5, formatted5);
 }
 
-TEST(Format, positive_float) {
+TEST(FormatDecimal, positive_float) {
     constexpr std::array<char, 8> control1   = {'0', '0', '2', '.',
                                               '3', '4', '5', '6'};
     constexpr std::array<char, 8> formatted1 = const_format<"{:08.4}">(2.3456);
@@ -82,7 +82,7 @@ TEST(Format, positive_float) {
     EXPECT_EQ(control4, formatted4);
 }
 
-TEST(Format, negative_float) {
+TEST(FormatDecimal, negative_float) {
     constexpr std::array<char, 8> control1   = {'-', '0', '2', '.',
                                                 '3', '4', '5', '6'};
     constexpr std::array<char, 8> formatted1 = const_format<"{:08.4}">(-2.3456);
@@ -101,8 +101,3 @@ TEST(Format, negative_float) {
     EXPECT_EQ(control2, formatted2);
     EXPECT_EQ(control3, formatted3);
 }
-//
-// TEST(Format, string) {
-//    // TODO
-//    EXPECT_EQ(true, false);
-//}
