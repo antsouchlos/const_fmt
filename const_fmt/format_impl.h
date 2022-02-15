@@ -32,7 +32,7 @@ namespace const_fmt { namespace const_fmt_detail {
         (factor)*1000000000
 
 template <typename T>
-constexpr int count_digits_fallback(T n) {
+constexpr int count_digits_decimal_fallback(T n) {
     int count = 1;
     for (;;) {
         if (n < 10) return count;
@@ -44,7 +44,7 @@ constexpr int count_digits_fallback(T n) {
     }
 }
 
-inline int do_count_digits(uint64_t n) {
+inline int do_count_digits_decimal(uint64_t n) {
     // Maps bsr(n) to ceil(log10(pow(2, bsr(n) + 1) - 1)).
     static constexpr uint8_t bsr2log10[] = {
         1,  1,  1,  2,  2,  2,  3,  3,  3,  4,  4,  4,  4,  5,  5,  5,
@@ -71,10 +71,10 @@ constexpr inline auto count_digits_base(uint64_t n) -> int {
         return result;
     } else {
         if (!std::is_constant_evaluated()) {
-            return do_count_digits(n);
+            return do_count_digits_decimal(n);
         }
 
-        return count_digits_fallback(n);
+        return count_digits_decimal_fallback(n);
     }
 }
 
@@ -135,6 +135,7 @@ constexpr inline void format_base(char* out, uint_t value, int n_digits,
     copy2(out, digits2_base<t_format_type>(static_cast<size_t>(value)));
 }
 
+
 // returns {abs_value, was_negative}
 template <std::signed_integral int_t>
 constexpr std::pair<typename std::make_unsigned<int_t>::type, bool>
@@ -165,7 +166,8 @@ constexpr std::pair<int_t, bool> get_abs_value(int_t value) {
 template <fmt_data_t t_fmt_node, std::unsigned_integral uint_t>
 constexpr inline void format_int(char* out, uint_t value) {
     // format_decimal(out, value, count_digits(value), t_fmt_node.length);
-    format_base<t_fmt_node.type>(out, value, count_digits_base<t_fmt_node.type>(value),
+    format_base<t_fmt_node.type>(out, value,
+                                 count_digits_base<t_fmt_node.type>(value),
                                  t_fmt_node.length);
 }
 
