@@ -2,7 +2,8 @@
 #define LOGGER_TYPES_H
 
 
-#include <array>
+
+#include "std_lib.h"
 
 
 namespace const_fmt { namespace const_fmt_detail {
@@ -19,8 +20,8 @@ template <std::size_t N>
 class ConstString {
 public:
     constexpr ConstString(const char (&content)[N]) noexcept {
-        std::copy(std::begin(content), std::end(content),
-                  std::begin(m_content));
+        std::copy(&content[0], (&content[N-1] + 1),
+                  m_content.begin());
     }
 
     constexpr char operator[](std::size_t index) const noexcept {

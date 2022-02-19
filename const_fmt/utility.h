@@ -2,8 +2,9 @@
 #define LOGGER_UTILITY_H
 
 
-#include <cstring>
+#include <string.h>
 
+#include "std_lib.h"
 #include "types.h"
 
 
