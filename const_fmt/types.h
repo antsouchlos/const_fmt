@@ -20,8 +20,7 @@ template <std::size_t N>
 class ConstString {
 public:
     constexpr ConstString(const char (&content)[N]) noexcept {
-        std::copy(&content[0], (&content[N-1] + 1),
-                  m_content.begin());
+        std::copy(&content[0], (&content[N - 1] + 1), m_content.begin());
     }
 
     constexpr char operator[](std::size_t index) const noexcept {

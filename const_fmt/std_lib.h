@@ -5,6 +5,7 @@
 #ifndef CONST_FMT_NO_CPP_STD_LIB
 
 #include <array>
+#include <cstring>
 
 #else
 
