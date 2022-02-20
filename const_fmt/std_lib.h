@@ -114,7 +114,6 @@ public:
         return (&(m_data[t_size - 1]) + 1);
     }
 
-private:
     data_t m_data[t_size];
 };
 
