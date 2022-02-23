@@ -4,7 +4,7 @@
 
 /*
  *
- * Disclaimer: Probably very bad implementation of some features of the C++
+ * Disclaimer: Very bad (partially at least) implementation of some features of the C++
  * Standard Library. Not meant as a full-on stdlib implementation, only for
  * usage in this project (Underlined by the fact, that in this case the
  * namespace std is actually const_fmt::std)
