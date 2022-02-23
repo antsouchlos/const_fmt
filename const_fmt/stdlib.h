@@ -4,9 +4,9 @@
 
 /*
  *
- * Disclaimer: Very bad (partially at least) implementation of some features of the C++
- * Standard Library. Not meant as a full-on stdlib implementation, only for
- * usage in this project (Underlined by the fact, that in this case the
+ * Disclaimer: Very bad (partially at least) implementation of some features of
+ * the C++ Standard Library. Not meant as a full-on stdlib implementation, only
+ * for usage in this project (Underlined by the fact, that in this case the
  * namespace std is actually const_fmt::std)
  *
  */
@@ -38,21 +38,21 @@ using size_t = uint16_t;
 
 // clang-format off
 
-        template<typename T>
-        struct remove_reference {
-            using type = T;
-        };
-        template<typename T>
-        struct remove_reference<T &> {
-            using type = T;
-        };
-        template<typename T>
-        struct remove_reference<T &&> {
-            using type = T;
-        };
+template<typename T>
+struct remove_reference {
+    using type = T;
+};
+template<typename T>
+struct remove_reference<T &> {
+    using type = T;
+};
+template<typename T>
+struct remove_reference<T &&> {
+    using type = T;
+};
 
-        template<typename T>
-        using remove_reference_t = typename std::remove_reference<T>::type;
+template<typename T>
+using remove_reference_t = typename std::remove_reference<T>::type;
 
 // clang-format on
 
@@ -82,17 +82,17 @@ template <> struct make_unsigned<signed long long> { using type = unsigned long 
  */
 
 
-//template <typename _Tp>
-//concept integral = is_integral_v<_Tp>;
+// template <typename _Tp>
+// concept integral = is_integral_v<_Tp>;
 //
-//template <typename _Tp>
-//concept signed_integral = integral<_Tp> && is_signed_v<_Tp>;
+// template <typename _Tp>
+// concept signed_integral = integral<_Tp> && is_signed_v<_Tp>;
 //
-//template <typename _Tp>
-//concept unsigned_integral = integral<_Tp> && !signed_integral<_Tp>;
+// template <typename _Tp>
+// concept unsigned_integral = integral<_Tp> && !signed_integral<_Tp>;
 //
-//template <typename _Tp>
-//concept floating_point = is_floating_point_v<_Tp>;
+// template <typename _Tp>
+// concept floating_point = is_floating_point_v<_Tp>;
 
 
 /*
