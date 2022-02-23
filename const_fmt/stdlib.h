@@ -36,36 +36,77 @@ using size_t = uint16_t;
  */
 
 
+struct true_type {
+    constexpr static bool value = true;
+};
+
+struct false_type {
+    constexpr static bool value = false;
+};
+
+
 // clang-format off
 
-template <typename T> struct remove_reference { using type = T; };
-template <typename T> struct remove_reference<T &> {using type = T; };
-template <typename T> struct remove_reference<T &&> { using type = T; };
+template <typename type_t> struct remove_cv                        { typedef type_t type; };
+template <typename type_t> struct remove_cv<const type_t>          { typedef type_t type; };
+template <typename type_t> struct remove_cv<volatile type_t>       { typedef type_t type; };
+template <typename type_t> struct remove_cv<const volatile type_t> { typedef type_t type; };
 
-template <typename T>
-using remove_reference_t = typename std::remove_reference<T>::type;
+template <typename type_t> struct remove_const                     { typedef type_t type; };
+template <typename type_t> struct remove_const<const type_t>       { typedef type_t type; };
+
+template <typename type_t> struct remove_volatile                  { typedef type_t type; };
+template <typename type_t> struct remove_volatile<volatile type_t> { typedef type_t type; };
+
+template <typename type_t> struct remove_reference                 { using type = type_t; };
+template <typename type_t> struct remove_reference<type_t &>       { using type = type_t; };
+template <typename type_t> struct remove_reference<type_t &&>      { using type = type_t; };
+
+template <typename type_t> using remove_reference_t = typename std::remove_reference<type_t>::type;
+template <typename type_t> using remove_cv_t        = typename std::remove_cv<type_t>::type;
+template <typename type_t> using remove_const_t     = typename std::remove_const<type_t>::type;
+template <typename type_t> using remove_volatile_t  = typename std::remove_volatile<type_t>::type;
 
 
-template <class T> struct remove_cv                   { typedef T type; };
-template <class T> struct remove_cv<const T>          { typedef T type; };
-template <class T> struct remove_cv<volatile T>       { typedef T type; };
-template <class T> struct remove_cv<const volatile T> { typedef T type; };
+template <typename> struct is_integral_helper : public false_type {};
 
-template <class T> struct remove_const                { typedef T type; };
-template <class T> struct remove_const<const T>       { typedef T type; };
+template <> struct is_integral_helper<bool>               : public true_type {};
+template <> struct is_integral_helper<char>               : public true_type {};
+template <> struct is_integral_helper<signed char>        : public true_type {};
+template <> struct is_integral_helper<unsigned char>      : public true_type {};
+template <> struct is_integral_helper<wchar_t>            : public true_type {};
+template <> struct is_integral_helper<char16_t>           : public true_type {};
+template <> struct is_integral_helper<char32_t>           : public true_type {};
+template <> struct is_integral_helper<short>              : public true_type {};
+template <> struct is_integral_helper<unsigned short>     : public true_type {};
+template <> struct is_integral_helper<int>                : public true_type {};
+template <> struct is_integral_helper<unsigned int>       : public true_type {};
+template <> struct is_integral_helper<long>               : public true_type {};
+template <> struct is_integral_helper<unsigned long>      : public true_type {};
+template <> struct is_integral_helper<long long>          : public true_type {};
+template <> struct is_integral_helper<unsigned long long> : public true_type {};
 
-template <class T> struct remove_volatile             { typedef T type; };
-template <class T> struct remove_volatile<volatile T> { typedef T type; };
+template <typename type_t>
+struct is_integral
+        : public is_integral_helper<remove_cv_t<type_t>> {};
 
-// clang-format on
+
+template <typename> struct is_floating_point_helper : public false_type {};
+
+template<> struct is_floating_point_helper<float>       : public true_type {};
+template<> struct is_floating_point_helper<double>      : public true_type {};
+template<> struct is_floating_point_helper<long double> : public true_type {};
+
+template<typename _Tp>
+struct is_floating_point
+        : public is_floating_point_helper<remove_cv_t<_Tp>>::type {};
+
 
 
 constexpr inline bool is_constant_evaluated() noexcept {
     return __builtin_is_constant_evaluated();
 }
 
-
-// clang-format off
 
 template <typename type_t> struct make_unsigned    { using type = type_t; };
 
