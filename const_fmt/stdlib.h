@@ -36,6 +36,13 @@ using size_t = uint16_t;
  */
 
 
+// various
+
+
+constexpr inline bool is_constant_evaluated() noexcept {
+    return __builtin_is_constant_evaluated();
+}
+
 struct true_type {
     constexpr static bool value = true;
 };
@@ -43,6 +50,35 @@ struct true_type {
 struct false_type {
     constexpr static bool value = false;
 };
+
+
+// is_same
+
+
+template <typename fist_t, typename second_t>
+struct is_same : public false_type {};
+
+template <typename type_t>
+struct is_same<type_t, type_t> : public false_type {};
+
+
+// is_one_of
+
+
+template <typename...>
+struct is_one_of;
+template <typename type_t>
+struct is_one_of<type_t> {
+    constexpr static bool value = false;
+};
+template <typename type_t, typename first_t, typename... rest_t>
+struct is_one_of<type_t, first_t, rest_t...> {
+    constexpr static bool value = std::is_same<type_t, first_t>::value ||
+                                  is_one_of<type_t, rest_t...>::value;
+};
+
+
+// remove_x
 
 
 // clang-format off
@@ -67,46 +103,36 @@ template <typename type_t> using remove_cv_t        = typename std::remove_cv<ty
 template <typename type_t> using remove_const_t     = typename std::remove_const<type_t>::type;
 template <typename type_t> using remove_volatile_t  = typename std::remove_volatile<type_t>::type;
 
+// clang-format on
 
-template <typename> struct is_integral_helper : public false_type {};
 
-template <> struct is_integral_helper<bool>               : public true_type {};
-template <> struct is_integral_helper<char>               : public true_type {};
-template <> struct is_integral_helper<signed char>        : public true_type {};
-template <> struct is_integral_helper<unsigned char>      : public true_type {};
-template <> struct is_integral_helper<wchar_t>            : public true_type {};
-template <> struct is_integral_helper<char16_t>           : public true_type {};
-template <> struct is_integral_helper<char32_t>           : public true_type {};
-template <> struct is_integral_helper<short>              : public true_type {};
-template <> struct is_integral_helper<unsigned short>     : public true_type {};
-template <> struct is_integral_helper<int>                : public true_type {};
-template <> struct is_integral_helper<unsigned int>       : public true_type {};
-template <> struct is_integral_helper<long>               : public true_type {};
-template <> struct is_integral_helper<unsigned long>      : public true_type {};
-template <> struct is_integral_helper<long long>          : public true_type {};
-template <> struct is_integral_helper<unsigned long long> : public true_type {};
+// is_integral
+
 
 template <typename type_t>
-struct is_integral
-        : public is_integral_helper<remove_cv_t<type_t>> {};
+struct is_integral {
+    constexpr static bool value =
+        is_one_of<remove_cv_t<type_t>, bool, char, signed char, unsigned char,
+                  wchar_t, char16_t, char32_t, short, unsigned short, int,
+                  unsigned int, long, unsigned long, long long,
+                  unsigned long long>::value;
+};
 
 
-template <typename> struct is_floating_point_helper : public false_type {};
-
-template<> struct is_floating_point_helper<float>       : public true_type {};
-template<> struct is_floating_point_helper<double>      : public true_type {};
-template<> struct is_floating_point_helper<long double> : public true_type {};
-
-template<typename _Tp>
-struct is_floating_point
-        : public is_floating_point_helper<remove_cv_t<_Tp>>::type {};
+// is_floating_point
 
 
+template <typename type_t>
+struct is_floating_point {
+    constexpr static bool value =
+        is_one_of<remove_cv_t<type_t>, float, double, long double>::value;
+};
 
-constexpr inline bool is_constant_evaluated() noexcept {
-    return __builtin_is_constant_evaluated();
-}
 
+// make_unsigned
+
+
+// clang-format off
 
 template <typename type_t> struct make_unsigned    { using type = type_t; };
 
@@ -147,7 +173,7 @@ template <> struct make_unsigned<signed long long> { using type = unsigned long 
 
 
 template <typename input_t, typename output_t>
-void copy(input_t* start, input_t* end, output_t* dest_start) {
+constexpr inline void copy(input_t* start, input_t* end, output_t* dest_start) {
     memcpy(start, dest_start, end - start);
 }
 
@@ -165,7 +191,7 @@ std::remove_reference_t<T>&& move(T&& arg) noexcept {
 }
 
 template <typename T>
-void swap(T& t1, T& t2) {
+constexpr inline void swap(T& t1, T& t2) {
     T temp = std::move(t1);
     t1     = std::move(t2);
     t2     = std::move(temp);
