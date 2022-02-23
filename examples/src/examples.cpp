@@ -1,6 +1,8 @@
+#define CONST_FMT_NO_CPP_STDLIB
+
 #include <const_fmt/format.h>
-#include <iostream>
-#include <string_view>
+//#include <iostream>
+//#include <string_view>
 
 using namespace const_fmt;
 
@@ -9,9 +11,9 @@ int main() {
 
     // Convert s (with a type of 'std::array<char, N>') into something
     // writable to std::cout
-    std::string_view sv{&s[0], s.size()};
-
-    std::cout << sv << std::endl;
+//    std::string_view sv{&s[0], s.size()};
+//
+//    std::cout << sv << std::endl;
 
     return 0;
 }
