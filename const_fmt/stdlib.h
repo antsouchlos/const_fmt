@@ -59,7 +59,7 @@ template <typename fist_t, typename second_t>
 struct is_same : public false_type {};
 
 template <typename type_t>
-struct is_same<type_t, type_t> : public false_type {};
+struct is_same<type_t, type_t> : public true_type {};
 
 
 // is_one_of
@@ -110,23 +110,27 @@ template <typename type_t> using remove_volatile_t  = typename std::remove_volat
 
 
 template <typename type_t>
-struct is_integral {
-    constexpr static bool value =
-        is_one_of<remove_cv_t<type_t>, bool, char, signed char, unsigned char,
-                  wchar_t, char16_t, char32_t, short, unsigned short, int,
-                  unsigned int, long, unsigned long, long long,
-                  unsigned long long>::value;
-};
+using is_integral =
+    is_one_of<remove_cv_t<type_t>, bool, char, signed char, unsigned char,
+              wchar_t, char16_t, char32_t, short, unsigned short, int,
+              unsigned int, long, unsigned long, long long, unsigned long long>;
+
+
+// is_signed
+
+
+template <typename _Tp>
+using is_signed_integer = is_one_of<remove_cv_t<_Tp>, signed char, signed short,
+                                    signed int, signed long, signed long long>;
+
 
 
 // is_floating_point
 
 
 template <typename type_t>
-struct is_floating_point {
-    constexpr static bool value =
-        is_one_of<remove_cv_t<type_t>, float, double, long double>::value;
-};
+using is_floating_point =
+    is_one_of<remove_cv_t<type_t>, float, double, long double>;
 
 
 // make_unsigned
@@ -145,6 +149,16 @@ template <> struct make_unsigned<signed long long> { using type = unsigned long 
 // clang-format on
 
 
+// value definitions
+
+template <typename type_t>
+inline constexpr bool is_integral_v = is_integral<type_t>::value;
+template <typename type_t>
+inline constexpr bool is_signed_integer_v = is_signed_integer<type_t>::value;
+template <typename type_t>
+inline constexpr bool is_floating_point_v = is_floating_point<type_t>::value;
+
+
 /*
  *
  * concepts
@@ -152,17 +166,17 @@ template <> struct make_unsigned<signed long long> { using type = unsigned long 
  */
 
 
-// template <typename _Tp>
-// concept integral = is_integral_v<_Tp>;
-//
-// template <typename _Tp>
-// concept signed_integral = integral<_Tp> && is_signed_v<_Tp>;
-//
-// template <typename _Tp>
-// concept unsigned_integral = integral<_Tp> && !signed_integral<_Tp>;
-//
-// template <typename _Tp>
-// concept floating_point = is_floating_point_v<_Tp>;
+template <typename type_t>
+concept integral = is_integral_v<type_t>;
+
+template <typename type_t>
+concept signed_integral = is_signed_integer_v<type_t>;
+
+template <typename type_t>
+concept unsigned_integral = integral<type_t> && !signed_integral<type_t>;
+
+template <typename type_t>
+concept floating_point = is_floating_point_v<type_t>;
 
 
 /*
