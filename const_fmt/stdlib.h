@@ -240,7 +240,7 @@ public:
     constexpr array(const array&) = default;
     constexpr array(array&&) = default;
 
-    constexpr array& operator=(array& other) = default;
+    constexpr array& operator=(const array& other) = default;
     constexpr array& operator=(array&& other) = default;
 
     constexpr void swap(array<data_t, t_size>& other) noexcept {
@@ -268,6 +268,14 @@ public:
     }
 
     constexpr iterator end() noexcept {
+        return (&(m_data[t_size - 1]) + 1);
+    }
+
+    constexpr const_iterator begin() const noexcept {
+        return &(m_data[0]);
+    }
+
+    constexpr const_iterator end() const noexcept {
         return (&(m_data[t_size - 1]) + 1);
     }
 
