@@ -237,13 +237,10 @@ public:
     }
 
     constexpr array() noexcept = default;
-
-    constexpr array(array&) = default;
-
+    constexpr array(const array&) = default;
     constexpr array(array&&) = default;
 
     constexpr array& operator=(array& other) = default;
-
     constexpr array& operator=(array&& other) = default;
 
     constexpr void swap(array<data_t, t_size>& other) noexcept {
