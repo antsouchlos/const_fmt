@@ -187,8 +187,10 @@ concept floating_point = is_floating_point_v<type_t>;
 
 
 template <typename input_t, typename output_t>
-constexpr inline void copy(input_t* start, input_t* end, output_t* dest_start) {
-    memcpy(start, dest_start, end - start);
+constexpr inline void copy(const input_t* start, const input_t* end, output_t* dest_start) {
+    auto temp = start;
+    while (temp != end)
+        *(dest_start++) = *(temp++);
 }
 
 
