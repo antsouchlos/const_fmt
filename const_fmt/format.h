@@ -57,7 +57,7 @@ constexpr inline void format_arg(char* dest, const char* arg) {
     dest = dest + fmt_data.length - len;
 
     if (!std::is_constant_evaluated()) {
-        std::memcpy(dest, arg, len);
+        memcpy(dest, arg, len);
         return;
     }
     for (std::size_t i = 0; i < len; ++i) {
