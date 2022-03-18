@@ -251,6 +251,9 @@ public:
         }
     }
 
+    constexpr std::size_t size() const noexcept {
+        return t_size;
+    }
 
     constexpr data_t& operator[](std::size_t index) noexcept {
         return m_data[index];
