@@ -187,7 +187,8 @@ concept floating_point = is_floating_point_v<type_t>;
 
 
 template <typename input_t, typename output_t>
-constexpr inline void copy(const input_t* start, const input_t* end, output_t* dest_start) {
+constexpr inline void copy(const input_t* start, const input_t* end,
+                           output_t* dest_start) {
     auto temp = start;
     while (temp != end)
         *(dest_start++) = *(temp++);
@@ -236,9 +237,9 @@ public:
         static_assert(sizeof...(args) == t_size, "Invalid number of arguments");
     }
 
-    constexpr array() noexcept = default;
+    constexpr array() noexcept    = default;
     constexpr array(const array&) = default;
-    constexpr array(array&&) = default;
+    constexpr array(array&&)      = default;
 
     constexpr array& operator=(const array& other) = default;
     constexpr array& operator=(array&& other) = default;
@@ -250,6 +251,9 @@ public:
         }
     }
 
+    constexpr std::size_t size() const noexcept {
+        return t_size;
+    }
 
     constexpr data_t& operator[](std::size_t index) noexcept {
         return m_data[index];

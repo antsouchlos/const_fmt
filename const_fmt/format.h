@@ -66,16 +66,13 @@ constexpr inline void format_arg(char* dest, const char* arg) {
 };
 
 
-// End of recursion
-template <auto ast>
-constexpr inline void format_args(char*) {
-}
-
 template <auto fmt_data_array, typename first_arg_t, typename... args_t>
 constexpr inline void format_args(char* dest, first_arg_t first_arg,
                                   args_t... args) {
     format_arg<fmt_data_array[0]>(dest + fmt_data_array[0].position, first_arg);
-    format_args<drop_first(fmt_data_array)>(dest, args...);
+
+    if constexpr(fmt_data_array.size() > 1)
+        format_args<drop_first(fmt_data_array)>(dest, args...);
 }
 
 
