@@ -51,7 +51,9 @@ inline int do_count_digits_decimal(uint64_t n) {
         6,  6,  6,  7,  7,  7,  7,  8,  8,  8,  9,  9,  9,  10, 10, 10,
         10, 11, 11, 11, 12, 12, 12, 13, 13, 13, 13, 14, 14, 14, 15, 15,
         15, 16, 16, 16, 16, 17, 17, 17, 18, 18, 18, 19, 19, 19, 19, 20};
-    auto                            t = bsr2log10[__builtin_clzll(n | 1) ^ 63];
+
+    auto t = bsr2log10[__builtin_clzll(n | 1) ^ 63];
+
     static constexpr const uint64_t zero_or_powers_of_10[] = {
         0, 0, FMT_POWERS_OF_10(1U), FMT_POWERS_OF_10(1000000000ULL),
         10000000000000000000ULL};
@@ -80,9 +82,9 @@ constexpr inline auto count_digits_base(uint64_t n) -> int {
 
             return (result + count_digits_base<FormatType::b>(n));
         } else {
-            if (!std::is_constant_evaluated()) {
-                return do_count_digits_decimal(n);
-            }
+//            if (!std::is_constant_evaluated()) {
+//                return do_count_digits_decimal(n);
+//            }
             return count_digits_decimal_fallback(n);
         }
     }
@@ -161,7 +163,7 @@ constexpr inline void format_base(char* out, uint_t value, int n_digits,
     }
 
     if (value < divisor) {
-        *--out = digits2_base<t_format_type>(value*divisor)[0];
+        *--out = digits2_base<t_format_type>(value * divisor)[0];
         return;
     }
 
